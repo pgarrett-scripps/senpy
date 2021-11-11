@@ -1,4 +1,4 @@
-import np
+import numpy as np
 
 from senpy.abstract_class import LineSerializer
 from senpy.ms2.lines import SLine, ILine, ZLine, PeakLine

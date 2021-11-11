@@ -57,6 +57,7 @@ def remove_ptm(peptide):
 
     return peptide
 
+
 def get_fragment_ions(peptide, ion_types, charges, losses, residue_modifications):
     ptm_dict = get_ptm_index_dict(peptide)
     clean_peptide = remove_ptm(peptide)
@@ -76,10 +77,11 @@ def get_fragment_ions(peptide, ion_types, charges, losses, residue_modifications
                         abc_ion_peptide = clean_peptide[:i + 1]
 
                         frag_ion_mass = mass.fast_mass(abc_ion_peptide, ion_type=ion_type, charge=charge)
-                        frag_ion_mass -= losses[loss_type] / charge # Neutral Loss
+                        frag_ion_mass -= losses[loss_type] / charge  # Neutral Loss
 
-                        residue_modifications_list = [abc_ion_peptide.count(aa) * mass_shift for aa, mass_shift in residue_modifications.items()]
-                        frag_ion_mass += sum(residue_modifications_list) / charge # Residue specific modifications
+                        residue_modifications_list = [abc_ion_peptide.count(aa) * mass_shift for aa, mass_shift in
+                                                      residue_modifications.items()]
+                        frag_ion_mass += sum(residue_modifications_list) / charge  # Residue specific modifications
                         ptm_list = [ptm_mass for aa_index, ptm_mass in ptm_dict.items() if aa_index <= i]
                         frag_ion_mass += sum(ptm_list) / charge
 
@@ -92,8 +94,9 @@ def get_fragment_ions(peptide, ion_types, charges, losses, residue_modifications
                         frag_ion_mass = mass.fast_mass(xyz_ion_peptide, ion_type=ion_type, charge=charge)
                         frag_ion_mass -= losses[loss_type] / charge  # Neutral Loss
 
-                        residue_modifications_list = [xyz_ion_peptide.count(aa) * mass_shift for aa, mass_shift in residue_modifications.items()]
-                        frag_ion_mass += sum(residue_modifications_list) / charge # Residue specific modifications
+                        residue_modifications_list = [xyz_ion_peptide.count(aa) * mass_shift for aa, mass_shift in
+                                                      residue_modifications.items()]
+                        frag_ion_mass += sum(residue_modifications_list) / charge  # Residue specific modifications
 
                         ptm_list = [ptm_mass for aa_index, ptm_mass in ptm_dict.items() if aa_index >= i]
                         frag_ion_mass += sum(ptm_list) / charge
@@ -106,7 +109,8 @@ def get_fragment_ions(peptide, ion_types, charges, losses, residue_modifications
                         raise NotImplemented
 
 
-def get_fragment_ions_information(ms2_file, dta_select_filter_file, fragment_types, fragment_charges, fragment_losses, residue_modifications):
+def get_fragment_ions_information(ms2_file, dta_select_filter_file, fragment_types, fragment_charges, fragment_losses,
+                                  residue_modifications):
     print("fragment_types: ", fragment_types)
     print("fragment_charges: ", fragment_charges)
     print("fragment_losses: ", fragment_losses)
@@ -122,7 +126,16 @@ def get_fragment_ions_information(ms2_file, dta_select_filter_file, fragment_typ
             if unique_line.file_name == ms2_file_name:
                 dta_filter_dict[unique_line.low_scan] = unique_line
 
-    out_file = open("tmp.out", "w")
+    out_file = open(f"{ms2_file_name}.ions", "w", buffering=1_000_000)
+
+    out_file.write(f"H\tFragment Types\t{fragment_types}\n")
+    out_file.write(f"H\tFragment Charges\t{fragment_charges}\n")
+    out_file.write(f"H\tFragment Losses\t{fragment_losses}\n")
+    out_file.write(
+        "{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format("sequence", "charge", "scan_number", "collision_energy",
+                                                      "max_fragment_intensity", "identified_fragment_codes",
+                                                      "identified_masses_ppm", "identified_masses",
+                                                      "identified_intensities"))
     print("Reading: ", ms2_file)
     s_line_generator = parse_ms2_file_incremental(ms2_file)
     for s_line in s_line_generator:
@@ -134,14 +147,18 @@ def get_fragment_ions_information(ms2_file, dta_select_filter_file, fragment_typ
         fragment_ions = get_fragment_ions(unique_line.get_clean_seq(), fragment_types, fragment_charges,
                                           fragment_losses, residue_modifications)
 
+        max_ppm = 40
         fragment_ion_bins = {}
         for fragment_ion in fragment_ions:
-            bin_key = int(fragment_ion.mass * 100)
-            if bin_key not in fragment_ion_bins:
-                fragment_ion_bins[bin_key] = []
-            fragment_ion_bins[bin_key].append(fragment_ion)
+            start_bin_key = int((fragment_ion.mass - fragment_ion.mass * max_ppm / 1_000_000) * 100)
+            end_bin_key = int((fragment_ion.mass + fragment_ion.mass * max_ppm / 1_000_000) * 100)
+            for bin_key in range(start_bin_key, end_bin_key + 1):
+                if bin_key not in fragment_ion_bins:
+                    fragment_ion_bins[bin_key] = []
+                fragment_ion_bins[bin_key].append(fragment_ion)
 
         identified_fragment_codes = []
+        identified_masses_ppm = []
         identified_masses = []
         identified_intensities = []
         max_fragment_intensity = max(s_line.get_intensity_spectra())
@@ -153,26 +170,36 @@ def get_fragment_ions_information(ms2_file, dta_select_filter_file, fragment_typ
                 continue
 
             for fragment_ion in fragment_ion_bins[bin_key]:
-                if (mass - fragment_ion.mass) <= mass * 40 / 1_000_000:
+                fragment_ion_ppm = (fragment_ion.mass - mass) / fragment_ion.mass * 1_000_000
+                if abs(fragment_ion_ppm) <= max_ppm:
                     # found fragment ion!
                     identified_fragment_codes.append(fragment_ion.encode_ion())
-                    identified_masses.append(str(mass))
-                    identified_intensities.append(str(round(intensity)))
+                    identified_masses_ppm.append(fragment_ion_ppm)
+                    identified_masses.append(mass)
+                    identified_intensities.append(intensity)
+
         # print(unique_line.get_clean_seq())
         # print(identified_fragment_codes, identified_intensities)
         # find fragment ions in ms2 spectra
-        """plt.title("{} {} {} {}".format(unique_line.sequence, max_fragment_intensity, max(identified_intensities), collision_energy))
-        plt.bar(identified_masses, identified_intensities, width=5)
+        """my_cmap = plt.get_cmap("viridis")
+        colors = [my_cmap(abs(ppm/40)) for ppm in identified_masses_ppm]
+        plt.title("{} {} {} {}".format(unique_line.sequence, max_fragment_intensity, max(identified_intensities), collision_energy))
+        plt.bar(identified_masses, identified_intensities, width=5, color=colors)
         plt.show()"""
 
-        out_file.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(unique_line.sequence,
-                                                                 unique_line.charge,
-                                                                 unique_line.low_scan,
-                                                                 collision_energy,
-                                                                 max_fragment_intensity,
-                                                                 ";".join(identified_fragment_codes),
-                                                                 ";".join(identified_masses),
-                                                                 ";".join(identified_intensities)))
+        identified_masses_ppm = [str(round(x, 1)) for x in identified_masses_ppm]
+        identified_intensities = [str(round(x, 1)) for x in identified_intensities]
+        identified_masses = [str(round(x, 5)) for x in identified_masses]
+
+        out_file.write("{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\n".format(unique_line.sequence,
+                                                                     unique_line.charge,
+                                                                     unique_line.low_scan,
+                                                                     collision_energy,
+                                                                     max_fragment_intensity,
+                                                                     ";".join(identified_fragment_codes),
+                                                                     ";".join(identified_masses_ppm),
+                                                                     ';'.join(identified_masses),
+                                                                     ";".join(identified_intensities)))
     out_file.close()
 
 
@@ -212,6 +239,7 @@ def parse_args():
     # convert charges to integers
     args.fragment_ion_charges = [int(charge) for charge in args.fragment_ion_charges]
     return args
+
 
 if __name__ == "__main__":
     args = parse_args()

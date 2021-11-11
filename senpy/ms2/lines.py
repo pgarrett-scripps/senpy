@@ -1,7 +1,7 @@
 from dataclasses import field, dataclass
 from typing import List
 
-import np as np
+import numpy as np
 
 PeakLine = np.dtype(
     [

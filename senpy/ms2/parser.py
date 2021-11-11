@@ -38,7 +38,7 @@ def parse_file(file_path) -> ([str], [SLine]):
         return h_lines, s_lines
 
 
-def parse_file_incremental(file_path) -> ([str], [SLine]):
+def parse_file_incremental(file_path) -> SLine:
     """
     Parse ms2 file into h_lines and s_lines
     :param file_path: ms2 file

@@ -1,8 +1,6 @@
 import argparse
-import json
 import os
 from dataclasses import dataclass
-import matplotlib.pyplot as plt
 
 from pyteomics import mass
 from senpy.ms2.parser import parse_file_incremental as parse_ms2_file_incremental
@@ -62,12 +60,6 @@ def get_fragment_ions(peptide, ion_types, charges, losses, residue_modifications
     ptm_dict = get_ptm_index_dict(peptide)
     clean_peptide = remove_ptm(peptide)
 
-    abc_ion_mass_offset = 0
-
-    total_ptm_shift = 0
-    for aa in residue_modifications:
-        total_ptm_shift += clean_peptide.count(aa) * residue_modifications[aa]
-    xyz_ion_mass_offset = sum(ptm_dict.values()) + total_ptm_shift
     for i in range(len(clean_peptide)):
         for ion_type in ion_types:
             for loss_type in losses:
@@ -111,13 +103,19 @@ def get_fragment_ions(peptide, ion_types, charges, losses, residue_modifications
 
 def get_fragment_ions_information(ms2_file, dta_select_filter_file, fragment_types, fragment_charges, fragment_losses,
                                   residue_modifications):
+    supported_residues = set('ARNDCQGEHILKMFPSTWYV')
+    max_ppm = 40
+
+    # Fragment ion parameters
     print("fragment_types: ", fragment_types)
     print("fragment_charges: ", fragment_charges)
     print("fragment_losses: ", fragment_losses)
 
+    # Parse DTASelect-filter file
     ms2_file_name = os.path.basename(ms2_file).split(".")[0]
     print("MS2 File Name: ", ms2_file_name)
     print("Reading: ", dta_select_filter_file)
+
     h_lines, locus_lines, end_lines = parse_dta_filter_file(dta_select_filter_file)
     dta_filter_dict = {}
     # map appropriate file scan numbers to unique lines
@@ -125,9 +123,10 @@ def get_fragment_ions_information(ms2_file, dta_select_filter_file, fragment_typ
         for unique_line in locus_line.unique_lines:
             if unique_line.file_name == ms2_file_name:
                 dta_filter_dict[unique_line.low_scan] = unique_line
+    print(f"{len(dta_filter_dict)} ms2 scans identified in dta-filter")
 
-    out_file = open(f"{ms2_file_name}.ions", "w", buffering=1_000_000)
-
+    # Create outfile for fragment ions
+    out_file = open(f"{ms2_file.split('.')[0]}.ions", "w", buffering=1_000_000)
     out_file.write(f"H\tFragment Types\t{fragment_types}\n")
     out_file.write(f"H\tFragment Charges\t{fragment_charges}\n")
     out_file.write(f"H\tFragment Losses\t{fragment_losses}\n")
@@ -136,18 +135,27 @@ def get_fragment_ions_information(ms2_file, dta_select_filter_file, fragment_typ
                                                       "max_fragment_intensity", "identified_fragment_codes",
                                                       "identified_masses_ppm", "identified_masses",
                                                       "identified_intensities"))
+
     print("Reading: ", ms2_file)
+    invalid_residue_count = 0
     s_line_generator = parse_ms2_file_incremental(ms2_file)
     for s_line in s_line_generator:
         if s_line.low_scan not in dta_filter_dict:
             continue
 
+        assert (s_line.z_line.charge == dta_filter_dict[s_line.low_scan].charge)  # sanity check
+
+        # skip peptides with invalid Residues
+        clean_sequence = unique_line.get_clean_seq()
+        if not set(clean_sequence).issubset(supported_residues):
+            invalid_residue_count += 1
+            continue
+
         collision_energy = s_line.get_i_line_dict()['Collision Energy']
         unique_line = dta_filter_dict[s_line.low_scan]
-        fragment_ions = get_fragment_ions(unique_line.get_clean_seq(), fragment_types, fragment_charges,
+        fragment_ions = get_fragment_ions(clean_sequence, fragment_types, fragment_charges,
                                           fragment_losses, residue_modifications)
 
-        max_ppm = 40
         fragment_ion_bins = {}
         for fragment_ion in fragment_ions:
             start_bin_key = int((fragment_ion.mass - fragment_ion.mass * max_ppm / 1_000_000) * 100)
@@ -201,6 +209,8 @@ def get_fragment_ions_information(ms2_file, dta_select_filter_file, fragment_typ
                                                                      ';'.join(identified_masses),
                                                                      ";".join(identified_intensities)))
     out_file.close()
+
+    print(f"invalid_residue_count: {invalid_residue_count}")
 
 
 def parse_args():

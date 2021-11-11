@@ -144,6 +144,7 @@ def get_fragment_ions_information(ms2_file, dta_select_filter_file, fragment_typ
             continue
 
         assert (s_line.z_line.charge == dta_filter_dict[s_line.low_scan].charge)  # sanity check
+        unique_line = dta_filter_dict[s_line.low_scan]
 
         # skip peptides with invalid Residues
         clean_sequence = unique_line.get_clean_seq()
@@ -152,7 +153,6 @@ def get_fragment_ions_information(ms2_file, dta_select_filter_file, fragment_typ
             continue
 
         collision_energy = s_line.get_i_line_dict()['Collision Energy']
-        unique_line = dta_filter_dict[s_line.low_scan]
         fragment_ions = get_fragment_ions(clean_sequence, fragment_types, fragment_charges,
                                           fragment_losses, residue_modifications)
 

@@ -80,3 +80,24 @@ class SLine:
         for i_line in self.i_lines:
             i_line_dict[i_line.keyword] = i_line.value
         return i_line_dict
+
+    def get_retention_time(self):
+        tmp_dict = self.get_i_line_dict()
+        if 'RetTime' in tmp_dict:
+            return float(tmp_dict['RetTime'])
+        else:
+            return None
+
+    def get_ccs(self):
+        tmp_dict = self.get_i_line_dict()
+        if 'ccs' in tmp_dict:
+            return float(tmp_dict['ccs'])
+        else:
+            return None
+
+    def get_ook0(self):
+        tmp_dict = self.get_i_line_dict()
+        if 'ook0' in tmp_dict:
+            return float(tmp_dict['ook0'])
+        else:
+            return None

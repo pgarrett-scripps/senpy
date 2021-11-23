@@ -36,7 +36,7 @@ class MLineSerializer(LineSerializer):
         calculated_mass = None if line_elements[3] == 'NA' else float(line_elements[3])
         DeltaCN = None if line_elements[4] == 'NA' else float(line_elements[4])
         xcorr = None if line_elements[5] == 'NA' else float(line_elements[5])
-        sp = None if line_elements[6] == 'NA' else int(line_elements[6])
+        sp = None if line_elements[6] == 'NA' else float(line_elements[6])
         matched_ions = None if line_elements[7] == 'NA' else int(line_elements[7])
         expected_ions = None if line_elements[8] == 'NA' else int(line_elements[8])
         sequence = None if line_elements[9] == 'NA' else line_elements[9]

@@ -103,5 +103,5 @@ def write_file(h_lines: [str], locus_lines: [LocusLine], end_lines: [str], out_f
 
 
 if __name__ == "__main__":
-    h_lines, locus_lines, end_lines = parse_file("C:\\Users\\diash\\PycharmProjects\\ip2_file_package\\sample_files\\sample_frag_ion\\DTASelect-filter.txt")
+    h_lines, locus_lines, end_lines = parse_file("/sample_frag_ion\\DTASelect-filter.txt")
     write_file(h_lines, locus_lines, end_lines, "tmp_out.dta")

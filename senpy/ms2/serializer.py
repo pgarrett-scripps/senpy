@@ -1,6 +1,8 @@
 import numpy as np
 
 from senpy.abstract_class import LineSerializer
+from senpy.ms2.exceptions import Ms2FileDeserializationSLineException, Ms2FileDeserializationILineException, \
+    Ms2FileDeserializationZLineException, Ms2FileDeserializationPeakLineException
 from senpy.ms2.lines import SLine, ILine, ZLine, PeakLine
 
 
@@ -8,6 +10,8 @@ class SLineSerializer(LineSerializer):
     @staticmethod
     def deserialize(line: str) -> SLine:
         line_elements = line.rstrip().split("\t")
+        if len(line_elements) < 4:
+            raise Ms2FileDeserializationSLineException(_line=line)
         low_scan = int(line_elements[1])
         high_scan = int(line_elements[2])
         mz = np.float32(line_elements[3])
@@ -28,6 +32,8 @@ class ILineSerializer(LineSerializer):
     @staticmethod
     def deserialize(line: str) -> ILine:
         line_elements = line.rstrip().split("\t")
+        if len(line_elements) < 3:
+            raise Ms2FileDeserializationILineException(_line=line)
         keyword = line_elements[1]
         value = line_elements[2]
         return ILine(keyword, value)
@@ -46,6 +52,8 @@ class ZLineSerializer(LineSerializer):
     @staticmethod
     def deserialize(line: str) -> ZLine:
         line_elements = line.rstrip().split("\t")
+        if len(line_elements) < 3:
+            raise Ms2FileDeserializationZLineException(_line=line)
         charge = int(line_elements[1])
         mass = np.float32(line_elements[2])
         return ZLine(charge, mass)
@@ -64,6 +72,8 @@ class PeakLineSerializer(LineSerializer):
     @staticmethod
     def deserialize(line: str) -> PeakLine:
         line_elements = line.rstrip().split(" ")
+        if len(line_elements) < 2:
+            raise Ms2FileDeserializationPeakLineException(_line=line)
         mz = np.float32(line_elements[0])
         intensity = np.float32(line_elements[1])
         peak_line = np.array([(mz, intensity)], dtype=PeakLine)[0]

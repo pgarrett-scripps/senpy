@@ -30,7 +30,7 @@ class MLine(Line):
         #M	6	0	5415.35096	0.0000	0.0000	0.000	1	159	K.LSNGARCSMNTEDGGFY(79.966331)PGQVLIGPAK.I	U	NA	NA
     """
 
-    xcoor_rank: int
+    xcorr_rank: int
     sp_rank: int
     calculated_mass: float
     DeltaCN: float
@@ -40,6 +40,10 @@ class MLine(Line):
     expected_ions: int
     sequence: str
     validation_status: str
+    predicted_ook0: float
+    tims_score: float
+    tims_b_score_m2: float = None
+    tims_b_score_best_m: float = None
 
     l_lines: List[LLine] = field(default_factory=list)
 
@@ -51,6 +55,19 @@ class MLine(Line):
             if "sp" == l_line.locus_name[:2]:
                 return False
         return True
+
+    def __eq__(self, other):
+        if not isinstance(other, MLine):
+            return False
+        else:
+            return self.xcorr_rank == other.xcorr_rank and self.xcorr == other.xcorr and \
+                   self.sp_rank == other.sp_rank and self.sp == other.sp and \
+                   self.calculated_mass == other.calculated_mass and self.DeltaCN == other.DeltaCN and \
+                   self.matched_ions == other.matched_ions and self.expected_ions == other.expected_ions and \
+                   self.sequence == other.sequence and self.validation_status == other.validation_status and \
+                   self.predicted_ook0 == other.predicted_ook0 and self.tims_score == other.tims_score and \
+                   self.tims_b_score_m2 == other.tims_b_score_m2 and \
+                   self.tims_b_score_best_m == other.tims_b_score_best_m
 
 @dataclass
 class SLine(Line):
@@ -72,5 +89,19 @@ class SLine(Line):
     total_ion_intensity: float
     lowest_Sp: float
     number_matches: int
+    experimental_ook0: float
+    experimental_mz: float
+    corrected_ook0: float
 
     m_lines: List[MLine] = field(default_factory=list)
+
+    def __eq__(self, other):
+        if not isinstance(other, SLine):
+            return False
+        else:
+            return self.low_scan == other.low_scan and self.high_scan == other.high_scan and \
+                   self.charge == other.charge and self.process_time == other.process_time and \
+                   self.server == other.server and self.experimental_mass == other.experimental_mass and \
+                   self.total_ion_intensity == other.total_ion_intensity and self.lowest_Sp == other.lowest_Sp and \
+                   self.number_matches == other.number_matches and self.experimental_ook0 == other.experimental_ook0 and \
+                   self.experimental_mz == other.experimental_mz and self.corrected_ook0 == other.corrected_ook0

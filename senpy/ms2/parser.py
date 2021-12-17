@@ -1,12 +1,46 @@
 from senpy.ms2.lines import SLine
 from senpy.ms2.serializer import SLineSerializer, ILineSerializer, ZLineSerializer, PeakLineSerializer
 
-def parse_file(file_path) -> ([str], [SLine]):
+def read_file(file_path) -> ([str], [SLine]):
     """
-    Parse ms2 file into h_lines and s_lines
-    :param file_path: ms2 file
-    :return: h_lines: [str], s_lines: [SLine]
+    Return list of H_lines and S_lines, from provided sqt file. Will always
+    return correctly and fully read Precursors/PSMCandidates/Locus' until
+    eof or corrupted line is reached. Errors are logged accordingly and not
+    thrown outside this function to preserve robustness.
+    :param:     file_path:          str to the path for the sqt file
+    :return:    ([str], [SLine]):   lists of Hlines and SLines
     """
+    h_lines, s_lines = [], []
+
+    with open(file_path) as file:
+        for line in file:
+
+            if line[0] == 'H':
+                h_lines.append(line)
+            elif line[0] == 'S':
+                if len(s_lines) > 0: # convert peak list to np array
+                    s_lines[-1].convert_peak_list_to_arr()
+                s_lines.append(SLineSerializer.deserialize(line))
+            elif line[0] == 'I':
+                s_lines[-1].i_lines.append(ILineSerializer.deserialize(line))
+            elif line[0] == 'Z':
+                s_lines[-1].z_line = ZLineSerializer.deserialize(line)
+            else:
+                s_lines[-1].peak_lines.append(PeakLineSerializer.deserialize(line))
+
+        return h_lines, s_lines
+
+
+def read_file_incrementally(file_path) -> SLine:
+    """
+    Return S_lines incrementally, from provided sqt file. Will always
+    return correctly and fully read Precursors/PSMCandidates/Locus' until
+    eof or corrupted line is reached. Errors are logged accordingly and not
+    thrown outside this function to preserve robustness.
+    :param:     file_path:          str to the path for the sqt file
+    :return:    ([SLine]):          lists of SLines
+    """
+
     h_lines, s_lines = [], []
 
     with open(file_path) as file:
@@ -15,66 +49,27 @@ def parse_file(file_path) -> ([str], [SLine]):
 
             if line[0] == 'H':
                 h_lines.append(line)
-
             elif line[0] == 'S':
-                if s_line is not None:
-                    s_line.convert_peak_list_to_arr()
-
-                s_line = SLineSerializer.deserialize(line)
-                s_lines.append(s_line)
-
-            elif line[0] == 'I':
-                i_line = ILineSerializer.deserialize(line)
-                s_line.i_lines.append(i_line)
-
-            elif line[0] == 'Z':
-                z_line = ZLineSerializer.deserialize(line)
-                s_line.z_line = z_line
-
-            else:  # Peak Line
-                peak_line = PeakLineSerializer.deserialize(line)
-                s_line.peak_lines.append(peak_line)
-
-        return h_lines, s_lines
-
-
-def parse_file_incremental(file_path) -> SLine:
-    """
-    Parse ms2 file into h_lines and s_lines
-    :param file_path: ms2 file
-    :return: h_lines: [str], s_lines: [SLine]
-    """
-
-    with open(file_path) as file:
-        s_line = None
-        for line in file:
-
-            if line[0] == 'H':
-                continue
-
-            elif line[0] == 'S':
-                if s_line is not None:
+                if s_line: # convert peak list to np array
                     s_line.convert_peak_list_to_arr()
                     yield s_line
-
                 s_line = SLineSerializer.deserialize(line)
-
             elif line[0] == 'I':
-                i_line = ILineSerializer.deserialize(line)
-                s_line.i_lines.append(i_line)
-
+                s_line.i_lines.append(ILineSerializer.deserialize(line))
             elif line[0] == 'Z':
-                z_line = ZLineSerializer.deserialize(line)
-                s_line.z_line = z_line
-
-            else:  # Peak Line
-                peak_line = PeakLineSerializer.deserialize(line)
-                s_line.peak_lines.append(peak_line)
-
+                s_line.z_line = ZLineSerializer.deserialize(line)
+            else:
+                s_line.peak_lines.append(PeakLineSerializer.deserialize(line))
         return s_line
 
 
 def write_file(h_lines: [str], s_lines: [SLine], out_file_path: str) -> None:
+    """
+    Write Ms2 file from hlines and slines
+    :param:     h_lines:    [str],      list of header lines
+    :param:     s_lines:    [SLine],    list of SLines
+    :param:     out_file_path   str,    string to the ms2 output file path
+    """
     with open(out_file_path, "w") as file:
 
         for h_line in h_lines:  # Write header lines

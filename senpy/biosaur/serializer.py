@@ -3,8 +3,33 @@ import ast
 from senpy.abstract_class import LineSerializer
 from senpy.biosaur.lines import FeatureLine
 
+class DinosuarLineSerializer(LineSerializer):
+    @staticmethod
+    def deserialize(line: str) -> FeatureLine:
+        line_elements = line.rstrip().split("\t")
+        mz = float(line_elements[0])
+        mostAbundantMz = float(line_elements[1])
+        charge = int(line_elements[2])
+        rtStart = float(line_elements[3])
+        rtApex = float(line_elements[4])
+        rtEnd = float(line_elements[5])
+        fwhm = float(line_elements[6])
+        nIsotopes = int(line_elements[7])
+        nScans = int(line_elements[8])
+        averagineCorr = float(line_elements[9])
+        mass = float(line_elements[10])
+        massCalib = float(line_elements[11])
+        intensityApex = float(line_elements[12])
+        intensitySum = float(line_elements[13])
 
-class FeatureLineSerializer(LineSerializer):
+        feature_line = FeatureLine(massCalib, rtApex, intensityApex, charge, nIsotopes, nScans, None,
+                                   None, None, None, None, None,
+                                   None, None, None, None, None, mz, rtStart, rtEnd, id,
+                                   None, None, None)
+        return feature_line
+
+
+class BiosaurFeatureLineSerializer(LineSerializer):
     @staticmethod
     def deserialize(line: str) -> FeatureLine:
         line_elements = line.rstrip().split("\t")

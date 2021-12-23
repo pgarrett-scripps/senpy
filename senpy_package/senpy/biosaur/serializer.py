@@ -1,4 +1,3 @@
-from typing import List
 import ast
 from senpy.abstract_class import LineSerializer
 from senpy.biosaur.lines import FeatureLine

@@ -4,7 +4,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="Ip2FileUtil",
+    name="senpy",
     version="0.0.1",
     author="Patrick Garrett",
     author_email="pgarrett@scripps.edu",
@@ -20,7 +20,7 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    package_dir={"": "senpy"},
-    packages=setuptools.find_packages(where="senpy"),
+    package_dir={"": "senpy_package"},
+    packages=setuptools.find_packages(where="senpy_package"),
     python_requires=">=3.6",
 )

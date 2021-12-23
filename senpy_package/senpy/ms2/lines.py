@@ -1,7 +1,8 @@
 from dataclasses import field, dataclass
 from typing import List
-
 import numpy as np
+
+from senpy.abstract_class import Line
 
 PeakLine = np.dtype(
     [
@@ -27,7 +28,7 @@ class ZLine:
 
 
 @dataclass
-class ILine:
+class ILine(Line):
     """
     Class keeping track of ms2 I lines.
 
@@ -43,7 +44,7 @@ class ILine:
 
 
 @dataclass
-class SLine:
+class SLine(Line):
     """
     Class keeping track of ms2 S lines.
 

@@ -1,5 +1,3 @@
-from abc import ABC
-
 from senpy.abstract_class import LineSerializer
 from senpy.dtaSelectFilter.lines import LocusLine, UniqueLine
 

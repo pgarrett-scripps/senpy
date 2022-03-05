@@ -22,7 +22,7 @@ class SLineSerializer(LineSerializer):
         line_elements = ["S",
                          f"{s_line.low_scan:06d}",
                          f"{s_line.high_scan:06d}",
-                         s_line.mz
+                         round(s_line.mz, 4)
                          ]
         line_elements = [str(elem) for elem in line_elements]
 

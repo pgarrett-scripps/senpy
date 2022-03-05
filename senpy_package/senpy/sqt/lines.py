@@ -52,7 +52,7 @@ class MLine(Line):
 
     def is_reverse(self) -> bool:
         for l_line in self.l_lines:
-            if "sp" == l_line.locus_name[:2]:
+            if "Reverse" not in l_line.locus_name:
                 return False
         return True
 

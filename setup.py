@@ -20,7 +20,7 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    package_dir={"": "senpy_package"},
-    packages=setuptools.find_packages(where="senpy_package"),
+    package_dir={"": "senpy"},
+    packages=setuptools.find_packages(where="senpy"),
     python_requires=">=3.6",
 )

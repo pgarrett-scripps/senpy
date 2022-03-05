@@ -86,6 +86,8 @@ class SLine(Line):
         tmp_dict = self.get_i_line_dict()
         if 'RetTime' in tmp_dict:
             return float(tmp_dict['RetTime'])
+        elif 'Retention Time' in tmp_dict:
+            return float(tmp_dict['Retention Time'])
         else:
             return None
 
@@ -93,6 +95,8 @@ class SLine(Line):
         tmp_dict = self.get_i_line_dict()
         if 'ccs' in tmp_dict:
             return float(tmp_dict['ccs'])
+        elif 'CCS' in tmp_dict:
+            return float(tmp_dict['CCS'])
         else:
             return None
 
@@ -100,5 +104,7 @@ class SLine(Line):
         tmp_dict = self.get_i_line_dict()
         if 'ook0' in tmp_dict:
             return float(tmp_dict['ook0'])
+        elif 'Ion Mobility' in tmp_dict:
+            return float(tmp_dict['Ion Mobility'])
         else:
             return None

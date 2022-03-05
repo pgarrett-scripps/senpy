@@ -3,8 +3,8 @@ import os
 from dataclasses import dataclass
 
 from pyteomics import mass
-from senpy_package.senpy.ms2.parser import parse_file_incremental as parse_ms2_file_incremental
-from senpy_package.senpy.dtaSelectFilter.parser import parse_file as parse_dta_filter_file
+from ms2 import parse_file_incremental as parse_ms2_file_incremental
+from dtaSelectFilter import parse_file as parse_dta_filter_file
 
 
 def get_fragment(peptide, ion_type, ion_number, loss, charge):

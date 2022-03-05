@@ -1,4 +1,4 @@
-from senpy_package.senpy.ms2.parser import read_file, write_file
+from ms2 import read_file, write_file
 
 
 h_lines, s_lines = read_file("C:\\Users\\diash\\PycharmProjects\\ip2_file_package\\sample_files\\sample.ms2")

@@ -4,8 +4,8 @@ import os
 import numpy as np
 from matplotlib import pyplot as plt
 
-from senpy_package.senpy.dtaSelectFilter.parser import parse_file as parse_dta_filter_file
-from senpy_package.senpy.sqt import parse_file as parse_sqt_file
+from dtaSelectFilter import parse_file as parse_dta_filter_file
+from sqt import parse_file as parse_sqt_file
 
 
 def parse_args():

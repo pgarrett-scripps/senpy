@@ -86,16 +86,13 @@ def write_file(h_lines: [str], s_lines: [SLine], out_file_path: str) -> None:
                 file.write(PeakLineSerializer.serialize(peak_line))
 
 
-def write_file_incrementally(h_lines: [str], s_lines: [SLine], out_file: TextIO) -> None:
+def write_sline(s_lines: [SLine], out_file: TextIO) -> None:
     """
     Write Ms2 file from hlines and slines
     :param:     h_lines:    [str],      list of header lines
     :param:     s_lines:    [SLine],    list of SLines
     :param:     out_file_path   str,    string to the ms2 output file path
     """
-    for h_line in h_lines:  # Write header lines
-        out_file.write(h_line)
-
     for s_line in s_lines:  # Write S lines
         out_file.write(SLineSerializer.serialize(s_line))
         for i_line in s_line.i_lines:  # Write I lines

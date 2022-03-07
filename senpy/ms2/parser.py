@@ -1,3 +1,5 @@
+from typing import TextIO
+
 from senpy.ms2.lines import SLine
 from senpy.ms2.serializer import SLineSerializer, ILineSerializer, ZLineSerializer, PeakLineSerializer
 
@@ -84,7 +86,7 @@ def write_file(h_lines: [str], s_lines: [SLine], out_file_path: str) -> None:
                 file.write(PeakLineSerializer.serialize(peak_line))
 
 
-def write_file_incrementally(h_lines: [str], s_lines: [SLine], out_file: File) -> None:
+def write_file_incrementally(h_lines: [str], s_lines: [SLine], out_file: TextIO) -> None:
     """
     Write Ms2 file from hlines and slines
     :param:     h_lines:    [str],      list of header lines
@@ -97,7 +99,7 @@ def write_file_incrementally(h_lines: [str], s_lines: [SLine], out_file: File) -
     for s_line in s_lines:  # Write S lines
         out_file.write(SLineSerializer.serialize(s_line))
         for i_line in s_line.i_lines:  # Write I lines
-            file.write(ILineSerializer.serialize(i_line))
+            out_file.write(ILineSerializer.serialize(i_line))
         out_file.write(ZLineSerializer.serialize(s_line.z_line))  # Write z line
         for peak_line in s_line.peak_lines:  # Write peak lines
             out_file.write(PeakLineSerializer.serialize(peak_line))

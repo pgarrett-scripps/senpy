@@ -82,3 +82,24 @@ def write_file(h_lines: [str], s_lines: [SLine], out_file_path: str) -> None:
             file.write(ZLineSerializer.serialize(s_line.z_line))  # Write z line
             for peak_line in s_line.peak_lines:  # Write peak lines
                 file.write(PeakLineSerializer.serialize(peak_line))
+
+
+def write_file_incrementally(h_lines: [str], s_lines: [SLine], out_file: File) -> None:
+    """
+    Write Ms2 file from hlines and slines
+    :param:     h_lines:    [str],      list of header lines
+    :param:     s_lines:    [SLine],    list of SLines
+    :param:     out_file_path   str,    string to the ms2 output file path
+    """
+    for h_line in h_lines:  # Write header lines
+        file.write(h_line)
+
+    for s_line in s_lines:  # Write S lines
+        file.write(SLineSerializer.serialize(s_line))
+        for i_line in s_line.i_lines:  # Write I lines
+            file.write(ILineSerializer.serialize(i_line))
+        file.write(ZLineSerializer.serialize(s_line.z_line))  # Write z line
+        for peak_line in s_line.peak_lines:  # Write peak lines
+            file.write(PeakLineSerializer.serialize(peak_line))
+
+

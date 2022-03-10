@@ -32,3 +32,12 @@ class Ms2FileDeserializationSLineException(Exception):
 
     def __repr__(self):
         return f"Error deserializing S-line: '{self.line}'"
+
+
+class Ms2FileDeserializationUnsupportedLineException(Exception):
+
+    def __init__(self, _line: str):
+        self.line = _line
+
+    def __repr__(self):
+        return f"Unsupported line type: '{self.line}'"

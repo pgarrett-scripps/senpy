@@ -1,17 +1,13 @@
 from abc import ABC, abstractmethod
 
+
 class Line(ABC):
-    pass
-
-
-class LineSerializer(ABC):
 
     @staticmethod
     @abstractmethod
-    def serialize(line: Line) -> str:
+    def deserialize(line: str):
         pass
 
-    @staticmethod
     @abstractmethod
-    def deserialize(line: str) -> Line:
+    def serialize(self) -> str:
         pass

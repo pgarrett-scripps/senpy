@@ -1,104 +1,104 @@
-from typing import TextIO
+from typing import List
 
-from senpy.ms2.lines import SLine
-from senpy.ms2.serializer import SLineSerializer, ILineSerializer, ZLineSerializer, PeakLineSerializer
+from senpy.ms2.lines import SLine, HLine, ZLine, PeakLine, ILine, Ms2Spectra, parse_ms2_line
 
-def read_file(file_path) -> ([str], [SLine]):
+
+def read_file(file_path) -> (List[HLine], List[Ms2Spectra]):
     """
-    Return list of H_lines and S_lines, from provided sqt file. Will always
-    return correctly and fully read Precursors/PSMCandidates/Locus' until
-    eof or corrupted line is reached. Errors are logged accordingly and not
-    thrown outside this function to preserve robustness.
+    Return HLines and Ms2Spectra, from provided ms2 file. Will always
+    return correctly and fully read ms2 file until eof or corrupted line is reached.
     :param:     file_path:          str to the path for the sqt file
-    :return:    ([str], [SLine]):   lists of Hlines and SLines
+    :return:    (List[HLine], List[Ms2Spectra]):          lists of HLines and Ms2Spectra
     """
-    h_lines, s_lines = [], []
+    h_lines, ms2_spectras = [], []
 
     with open(file_path) as file:
+        s_line, z_line, i_lines, peak_lines = None, None, [], []
         for line in file:
+            if line == "" or line == "\n":
+                continue
+            ms2_line = parse_ms2_line(line)
+            if isinstance(ms2_line, HLine):
+                h_lines.append(ms2_line)
+            elif isinstance(ms2_line, SLine):
+                if s_line is not None:
+                    ms2_spectras.append(Ms2Spectra(s_line=s_line,
+                                                   z_line=z_line,
+                                                   i_lines=i_lines,
+                                                   peak_lines=peak_lines
+                                                   )
+                                        )
+                    s_line, z_line, i_lines, peak_lines = None, None, [], []
+                s_line = ms2_line
+            elif isinstance(ms2_line, ILine):
+                i_lines.append(ms2_line)
+            elif isinstance(ms2_line, ZLine):
+                z_line = ms2_line
+            elif isinstance(ms2_line, PeakLine):
+                peak_lines.append(ms2_line)
 
-            if line[0] == 'H':
-                h_lines.append(line)
-            elif line[0] == 'S':
-                if len(s_lines) > 0: # convert peak list to np array
-                    s_lines[-1].convert_peak_list_to_arr()
-                s_lines.append(SLineSerializer.deserialize(line))
-            elif line[0] == 'I':
-                s_lines[-1].i_lines.append(ILineSerializer.deserialize(line))
-            elif line[0] == 'Z':
-                s_lines[-1].z_line = ZLineSerializer.deserialize(line)
-            else:
-                s_lines[-1].peak_lines.append(PeakLineSerializer.deserialize(line))
+        ms2_spectras.append(Ms2Spectra(s_line=s_line,
+                                       z_line=z_line,
+                                       i_lines=i_lines,
+                                       peak_lines=peak_lines
+                                       )
+                            )
 
-        return h_lines, s_lines
+        return h_lines, ms2_spectras
 
 
-def read_file_incrementally(file_path) -> SLine:
+def read_file_incrementally(file_path) -> List[Ms2Spectra]:
     """
-    Return S_lines incrementally, from provided sqt file. Will always
-    return correctly and fully read Precursors/PSMCandidates/Locus' until
-    eof or corrupted line is reached. Errors are logged accordingly and not
-    thrown outside this function to preserve robustness.
+    Return Ms2Spectra incrementally, from provided ms2 file. Will always
+    return correctly and fully read ms2 file until eof or corrupted line is reached.
     :param:     file_path:          str to the path for the sqt file
-    :return:    ([SLine]):          lists of SLines
+    :return:    List[Ms2Spectra]:          lists of SLines
     """
-
-    h_lines, s_lines = [], []
 
     with open(file_path) as file:
-        s_line = None
+        s_line, z_line, i_lines, peak_lines = None, None, [], []
         for line in file:
+            ms2_line = parse_ms2_line(line)
+            if isinstance(ms2_line, HLine):
+                continue
+            elif isinstance(ms2_line, SLine):
+                if s_line is not None:
+                    yield Ms2Spectra(s_line=s_line,
+                                     z_line=z_line,
+                                     i_lines=i_lines,
+                                     peak_lines=peak_lines
+                                     )
 
-            if line[0] == 'H':
-                h_lines.append(line)
-            elif line[0] == 'S':
-                if s_line: # convert peak list to np array
-                    s_line.convert_peak_list_to_arr()
-                    yield s_line
-                s_line = SLineSerializer.deserialize(line)
-            elif line[0] == 'I':
-                s_line.i_lines.append(ILineSerializer.deserialize(line))
-            elif line[0] == 'Z':
-                s_line.z_line = ZLineSerializer.deserialize(line)
-            else:
-                s_line.peak_lines.append(PeakLineSerializer.deserialize(line))
-        return s_line
+                    s_line, z_line, i_lines, peak_lines = None, None, [], []
+                s_line = ms2_line
+            elif isinstance(ms2_line, ILine):
+                i_lines.append(ms2_line)
+            elif isinstance(ms2_line, ZLine):
+                z_line = ms2_line
+            elif isinstance(ms2_line, PeakLine):
+                peak_lines.append(ms2_line)
+
+        return Ms2Spectra(s_line=s_line,
+                          z_line=z_line,
+                          i_lines=i_lines,
+                          peak_lines=peak_lines
+                          )
 
 
-def write_file(h_lines: [str], s_lines: [SLine], out_file_path: str) -> None:
+def write_file(h_lines: List[HLine], ms2_spectras: List[Ms2Spectra], out_file_path: str) -> None:
     """
-    Write Ms2 file from hlines and slines
-    :param:     h_lines:    [str],      list of header lines
-    :param:     s_lines:    [SLine],    list of SLines
+    Write Ms2 file from HLines and Ms2Spectra
+    :param:     h_lines:    [HLine],      list of header lines
+    :param:     ms2_spectras:    [Ms2Spectra],    ms2_spectras
     :param:     out_file_path   str,    string to the ms2 output file path
     """
     with open(out_file_path, "w") as file:
 
         for h_line in h_lines:  # Write header lines
-            file.write(h_line)
+            file.write(h_line.serialize())
 
-        for s_line in s_lines:  # Write S lines
-            file.write(SLineSerializer.serialize(s_line))
-            for i_line in s_line.i_lines:  # Write I lines
-                file.write(ILineSerializer.serialize(i_line))
-            file.write(ZLineSerializer.serialize(s_line.z_line))  # Write z line
-            for peak_line in s_line.peak_lines:  # Write peak lines
-                file.write(PeakLineSerializer.serialize(peak_line))
-
-
-def write_sline(s_lines: [SLine], out_file: TextIO) -> None:
-    """
-    Write Ms2 file from hlines and slines
-    :param:     h_lines:    [str],      list of header lines
-    :param:     s_lines:    [SLine],    list of SLines
-    :param:     out_file_path   str,    string to the ms2 output file path
-    """
-    for s_line in s_lines:  # Write S lines
-        out_file.write(SLineSerializer.serialize(s_line))
-        for i_line in s_line.i_lines:  # Write I lines
-            out_file.write(ILineSerializer.serialize(i_line))
-        out_file.write(ZLineSerializer.serialize(s_line.z_line))  # Write z line
-        for peak_line in s_line.peak_lines:  # Write peak lines
-            out_file.write(PeakLineSerializer.serialize(peak_line))
-
-
+        for i, ms2_spectra in enumerate(ms2_spectras):
+            ms2_spectra_str = ms2_spectra.serialize()
+            if i == len(ms2_spectras) - 1:  # remove final newline
+                ms2_spectra_str = ms2_spectra_str.rstrip()
+            file.write(ms2_spectra_str)

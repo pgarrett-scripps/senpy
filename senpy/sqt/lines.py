@@ -18,6 +18,8 @@ class LLine(Line):
     peptide_index_in_protein_sequence: int
     peptide_sequence: str
 
+
+
 @dataclass
 class MLine(Line):
     """

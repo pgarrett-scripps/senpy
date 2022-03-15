@@ -23,7 +23,7 @@ class PeakLine(Line):
     _MZ_INDEX: ClassVar[int] = 0
     _INTENSITY_INDEX: ClassVar[int] = 1
 
-    MZ_PRECISION: ClassVar[int] = 4
+    MZ_PRECISION: ClassVar[int] = 5
     INTENSITY_PRECISION: ClassVar[int] = 1
 
     __slots__ = 'mz', 'intensity'
@@ -91,7 +91,7 @@ class ZLine:
     _CHARGE_INDEX: ClassVar[int] = 1
     _MASS_INDEX: ClassVar[int] = 2
 
-    MASS_PRECISION: ClassVar[int] = 4
+    MASS_PRECISION: ClassVar[int] = 5
 
     __slots__ = 'charge', 'mass'
 
@@ -190,7 +190,7 @@ class SLine(Line):
 
     LOW_SCAN_LENGTH: ClassVar[int] = 6
     HIGH_SCAN_LENGTH: ClassVar[int] = 6
-    MZ_PRECISION: ClassVar[int] = 4
+    MZ_PRECISION: ClassVar[int] = 5
 
     @staticmethod
     def deserialize(line: str) -> 'SLine':

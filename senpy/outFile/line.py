@@ -3,7 +3,7 @@ from typing import List
 
 import numpy as np
 
-from senpy.abstract_class import Line
+from senpy.util import Line
 
 @dataclass
 class MobilogramItem:

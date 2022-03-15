@@ -1,4 +1,4 @@
-from senpy.abstract_class import LineSerializer
+from senpy.util import LineSerializer
 from senpy.dtaSelectFilter.lines import LocusLine
 from senpy.dtaSelectFilter.serializer import UniqueLineSerializer_version_2_1_12, LocusLineSerializer_version_2_1_12, \
     LocusLineSerializer_version_2_1_13, UniqueLineSerializer_version_2_1_13

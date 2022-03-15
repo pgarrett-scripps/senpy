@@ -1,6 +1,6 @@
 import numpy as np
 
-from senpy.abstract_class import LineSerializer
+from senpy.util import LineSerializer
 from senpy.outFile.line import OutLine, MobilogramItem
 
 

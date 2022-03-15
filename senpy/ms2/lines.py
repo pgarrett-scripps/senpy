@@ -3,7 +3,7 @@ from typing import List, Dict, Union, ClassVar
 import numpy as np
 
 from senpy.ms2 import exceptions as ms2_exceptions
-from senpy.abstract_class import Line
+from senpy.util import Line
 
 
 @dataclass
@@ -132,6 +132,22 @@ class ILine(Line):
     _KEYWORD_INDEX: ClassVar[int] = 0
     _VALUE_INDEX: ClassVar[int] = 1
 
+    # Keywords
+    PARENT_ID_KEYWORD: ClassVar[str] = 'TIMSTOF_Parent_ID'
+    PRECURSOR_ID_KEYWORD: ClassVar[str] = 'TIMSTOF_Precursor_ID'
+    OOK0_KEYWORD: ClassVar[str] = 'OOK0'
+    CCS_KEYWORD: ClassVar[str] = 'CCS'
+    RETENTION_TIME_KEYWORD: ClassVar[str] = 'Retention_Time'
+    COLLISION_ENERGY_KEYWORD: ClassVar[str] = 'Collision_Energy'
+    ISOLATION_MZ_KEYWORD: ClassVar[str] = 'Isolation_Mz'
+    ISOLATION_WIDTH_KEYWORD: ClassVar[str] = 'Isolation_Width'
+    SCAN_NUMBER_BEGIN_KEYWORD: ClassVar[str] = 'Scan_Number_Begin'
+    SCAN_NUMBER_END_KEYWORD: ClassVar[str] = 'Scan_Number_End'
+    PRECURSOR_INTENSITY_KEYWORD: ClassVar[str] = 'Intensity'
+    OOK0_SPECTRA_KEYWORD: ClassVar[str] = 'OOK0_Spectra'
+    CCS_SPECTRA_KEYWORD: ClassVar[str] = 'CCS_Spectra'
+    INTENSITY_SPECTRA_KEYWORD: ClassVar[str] = 'Intensity_Spectra'
+
     __slots__ = 'keyword', 'value'
 
     @staticmethod
@@ -200,7 +216,11 @@ class SLine(Line):
 @dataclass
 class Ms2Spectra:
     """
-    Dataclass tp store Ms2Spectra Line Types
+    Dataclass tp store Ms2Spectra Line Types. Each Ms2Spectra contains:
+        1 SLine
+        0 or more ILines
+        1 ZLine
+        0 or more PeakLines
     """
 
     s_line: SLine

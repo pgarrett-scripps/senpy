@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import List
 
-from senpy.abstract_class import Line
+from senpy.util import Line
 
 
 @dataclass

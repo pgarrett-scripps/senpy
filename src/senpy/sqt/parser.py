@@ -1,5 +1,5 @@
-from senpy.sqt.serializer import SLineSerializer, MLineSerializer, LLineSerializer
-from senpy.sqt.lines import SLine
+from sqt import SLineSerializer, MLineSerializer, LLineSerializer
+from sqt.lines import SLine
 
 
 def read_file(file_path: str) -> ([str], [SLine]):

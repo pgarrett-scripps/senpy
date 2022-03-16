@@ -192,6 +192,8 @@ class SLine(Line):
     HIGH_SCAN_LENGTH: ClassVar[int] = 6
     MZ_PRECISION: ClassVar[int] = 5
 
+    __slots__ = 'low_scan', 'high_scan', 'mz'
+
     @staticmethod
     def deserialize(line: str) -> 'SLine':
         line_elements = line.rstrip().split("\t")
@@ -227,6 +229,8 @@ class Ms2Spectra:
     i_lines: List[ILine]
     z_line: ZLine
     peak_lines: List[PeakLine]
+
+    __slots__ = 's_line', 'i_lines', 'z_line', 'peak_lines'
 
     def get_mz_spectra(self):
         return [peak_line.mz for peak_line in self.peak_lines]

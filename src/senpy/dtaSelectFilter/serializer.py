@@ -1,10 +1,10 @@
 from senpy.util import LineSerializer
-from senpy.dtaSelectFilter.lines import LocusLine, UniqueLine
+from senpy.dtaSelectFilter.lines import ProteinLine, PeptideLine
 
 
 class LocusLineSerializer_version_2_1_13(LineSerializer):
     @staticmethod
-    def deserialize(line: str) -> LocusLine:
+    def deserialize(line: str) -> ProteinLine:
         line_elements = line.rstrip().split("\t")
         locus_name = line_elements[0]
         sequence_count = int(line_elements[1])
@@ -18,12 +18,12 @@ class LocusLineSerializer_version_2_1_13(LineSerializer):
         empai = float(line_elements[9])
         description_name = str(line_elements[10])
 
-        line = LocusLine(locus_name, sequence_count, spectrum_count, sequence_coverage, length, molWt,
-                         pi, validation_status, nsaf, empai, description_name)
+        line = ProteinLine(locus_name, sequence_count, spectrum_count, sequence_coverage, length, molWt,
+                           pi, validation_status, nsaf, empai, description_name)
         return line
 
     @staticmethod
-    def serialize(locus_line: LocusLine) -> str:
+    def serialize(locus_line: ProteinLine) -> str:
         line_elements = [
             locus_line.locus_name,
             locus_line.sequence_count,
@@ -46,7 +46,7 @@ class LocusLineSerializer_version_2_1_13(LineSerializer):
 class UniqueLineSerializer_version_2_1_13(LineSerializer):
 
     @staticmethod
-    def deserialize(line: str) -> UniqueLine:
+    def deserialize(line: str) -> PeptideLine:
         line_elements = line.rstrip().split("\t")
 
         is_unique = line_elements[0] == "*"
@@ -67,12 +67,12 @@ class UniqueLineSerializer_version_2_1_13(LineSerializer):
         redundancy = float(line_elements[12])
         sequence = str(line_elements[13])
 
-        line = UniqueLine(is_unique, file_name, low_scan, high_scan, charge, x_corr, delta_cn, Conf, mass_plus_hydrogen,
-                          calc_mass_plus_hydrogen, ppm, total_intensity, spr, pi, ion_proportion, redundancy, sequence)
+        line = PeptideLine(is_unique, file_name, low_scan, high_scan, charge, x_corr, delta_cn, Conf, mass_plus_hydrogen,
+                           calc_mass_plus_hydrogen, ppm, total_intensity, spr, pi, ion_proportion, redundancy, sequence)
         return line
 
     @staticmethod
-    def serialize(unique_line: UniqueLine) -> str:
+    def serialize(unique_line: PeptideLine) -> str:
         file_line = '.'.join(
             [unique_line.file_name, str(unique_line.low_scan), str(unique_line.high_scan), str(unique_line.charge)])
         is_unique_symbol = '*' if unique_line.is_unique else ''
@@ -105,7 +105,7 @@ class UniqueLineSerializer_version_2_1_12(LineSerializer):
     """
 
     @staticmethod
-    def deserialize(line: str) -> UniqueLine:
+    def deserialize(line: str) -> PeptideLine:
         line_elements = line.rstrip().split("\t")
 
         is_unique = line_elements[0] == "*"
@@ -126,12 +126,12 @@ class UniqueLineSerializer_version_2_1_12(LineSerializer):
         redundancy = float(line_elements[11])
         sequence = str(line_elements[12])
 
-        line = UniqueLine(is_unique, file_name, low_scan, high_scan, charge, x_corr, delta_cn, Conf, mass_plus_hydrogen,
-                          calc_mass_plus_hydrogen, ppm, total_intensity, spr, pi, ion_proportion, redundancy, sequence)
+        line = PeptideLine(is_unique, file_name, low_scan, high_scan, charge, x_corr, delta_cn, Conf, mass_plus_hydrogen,
+                           calc_mass_plus_hydrogen, ppm, total_intensity, spr, pi, ion_proportion, redundancy, sequence)
         return line
 
     @staticmethod
-    def serialize(unique_line: UniqueLine) -> str:
+    def serialize(unique_line: PeptideLine) -> str:
         file_line = '.'.join(
             [unique_line.file_name, str(unique_line.low_scan), str(unique_line.high_scan), str(unique_line.charge)])
         is_unique_symbol = '*' if unique_line.is_unique else ''

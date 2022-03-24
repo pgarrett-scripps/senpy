@@ -1,9 +1,16 @@
+import ast
 from dataclasses import dataclass
+from enum import Enum
 from typing import List, Dict, Union, ClassVar
 import numpy as np
 
 from senpy.ms2 import exceptions as ms2_exceptions
 from senpy.util import Line
+
+
+class _PeakLineColumns(Enum):
+    mz = 0
+    intensity = 1
 
 
 @dataclass
@@ -19,10 +26,6 @@ class PeakLine(Line):
     mz: np.float32
     intensity: np.float32
 
-    _LINE_ELEMENTS: ClassVar[int] = 2
-    _MZ_INDEX: ClassVar[int] = 0
-    _INTENSITY_INDEX: ClassVar[int] = 1
-
     MZ_PRECISION: ClassVar[int] = 5
     INTENSITY_PRECISION: ClassVar[int] = 1
 
@@ -31,20 +34,19 @@ class PeakLine(Line):
     @staticmethod
     def deserialize(line: str) -> 'PeakLine':
         line_elements = line.rstrip().split(" ")
-        if len(line_elements) < PeakLine._LINE_ELEMENTS:
+        if len(line_elements) != len(_PeakLineColumns):
             raise ms2_exceptions.Ms2FileDeserializationPeakLineException(_line=line)
-        mz = np.float32(line_elements[PeakLine._MZ_INDEX])
-        intensity = np.float32(line_elements[PeakLine._INTENSITY_INDEX])
+        mz = np.float32(line_elements[_PeakLineColumns.mz.value])
+        intensity = np.float32(line_elements[_PeakLineColumns.intensity.value])
 
         peak_line = PeakLine(mz, intensity)
         return peak_line
 
     def serialize(self) -> str:
-        line_elements = [f"{self.mz:.{PeakLine.MZ_PRECISION}f}",
-                         f"{self.intensity:.{PeakLine.INTENSITY_PRECISION}f}"
-                         ]
+        line_elements = [None] * len(_PeakLineColumns)
+        line_elements[_PeakLineColumns.mz.value] = f"{self.mz:.{PeakLine.MZ_PRECISION}f}"
+        line_elements[_PeakLineColumns.intensity.value] = f"{self.mz:.{PeakLine.INTENSITY_PRECISION}f}"
         line_elements = [str(elem) for elem in line_elements]
-
         return ' '.join(line_elements) + '\n'
 
 
@@ -75,6 +77,12 @@ class HLine(Line):
         return '\t'.join(line_elements) + '\n'
 
 
+class _ZLineColumns(Enum):
+    letter = 0
+    charge = 1
+    mass = 2
+
+
 @dataclass
 class ZLine:
     """
@@ -87,10 +95,6 @@ class ZLine:
     charge: int
     mass: float
 
-    _LINE_ELEMENTS: ClassVar[int] = 3
-    _CHARGE_INDEX: ClassVar[int] = 1
-    _MASS_INDEX: ClassVar[int] = 2
-
     MASS_PRECISION: ClassVar[int] = 5
 
     __slots__ = 'charge', 'mass'
@@ -98,20 +102,28 @@ class ZLine:
     @staticmethod
     def deserialize(line: str) -> 'ZLine':
         line_elements = line.rstrip().split("\t")
-        if len(line_elements) < ZLine._LINE_ELEMENTS:
+
+        if len(line_elements) != len(_ZLineColumns):
             raise ms2_exceptions.Ms2FileDeserializationZLineException(_line=line)
-        charge = int(line_elements[ZLine._CHARGE_INDEX])
-        mass = float(line_elements[ZLine._MASS_INDEX])
+
+        charge = int(line_elements[_ZLineColumns.charge.value])
+        mass = float(line_elements[_ZLineColumns.mass.value])
+
         return ZLine(charge, mass)
 
     def serialize(self) -> str:
-        line_elements = ["Z",
-                         f"{self.charge}",
-                         f"{self.mass:.{ZLine.MASS_PRECISION}f}",
-                         ]
+        line_elements = [None]*len(_ZLineColumns)
+        line_elements[_ZLineColumns.letter.value] = "Z"
+        line_elements[_ZLineColumns.charge.value] = f"{self.charge}"
+        line_elements[_ZLineColumns.mass.value] = f"{self.mass:.{ZLine.MASS_PRECISION}f}"
         line_elements = [str(elem) for elem in line_elements]
-
         return '\t'.join(line_elements) + '\n'
+
+
+class _ILineColumns(Enum):
+    letter = 0
+    keyword = 1
+    value = 2
 
 
 @dataclass
@@ -127,10 +139,6 @@ class ILine(Line):
     """
     keyword: str
     value: str
-
-    _LINE_ELEMENTS: ClassVar[int] = 3
-    _KEYWORD_INDEX: ClassVar[int] = 0
-    _VALUE_INDEX: ClassVar[int] = 1
 
     # Keywords
     PARENT_ID_KEYWORD: ClassVar[str] = 'TIMSTOF_Parent_ID'
@@ -153,20 +161,30 @@ class ILine(Line):
     @staticmethod
     def deserialize(line: str) -> 'ILine':
         line_elements = line.rstrip().split("\t")
-        if len(line_elements) < ILine._LINE_ELEMENTS:
+
+        if len(line_elements) != len(_ILineColumns):
             raise ms2_exceptions.Ms2FileDeserializationILineException(_line=line)
-        keyword = line_elements[ILine._KEYWORD_INDEX]
-        value = line_elements[ILine._VALUE_INDEX]
+
+        keyword = line_elements[_ILineColumns.keyword.value]
+        value = line_elements[_ILineColumns.value.value]
+
         return ILine(keyword, value)
 
     def serialize(self) -> str:
-        line_elements = ["I",
-                         self.keyword,
-                         self.value
-                         ]
-        line_elements = [str(elem) for elem in line_elements]
 
+        line_elements = [None] * len(_ILineColumns)
+        line_elements[_ILineColumns.letter.value] = "I"
+        line_elements[_ILineColumns.keyword.value] = self.keyword
+        line_elements[_ILineColumns.value.value] = self.value
+        line_elements = [str(elem) for elem in line_elements]
         return '\t'.join(line_elements) + '\n'
+
+
+class _SLineColumns(Enum):
+    letter = 0
+    low_scan = 1
+    high_scan = 2
+    mz = 3
 
 
 @dataclass
@@ -183,11 +201,6 @@ class SLine(Line):
     high_scan: int
     mz: float
 
-    _LINE_ELEMENTS: ClassVar[int] = 4
-    _LOW_SCAN_INDEX: ClassVar[int] = 1
-    _HIGH_SCAN_INDEX: ClassVar[int] = 2
-    _MZ_INDEX: ClassVar[int] = 2
-
     LOW_SCAN_LENGTH: ClassVar[int] = 6
     HIGH_SCAN_LENGTH: ClassVar[int] = 6
     MZ_PRECISION: ClassVar[int] = 5
@@ -197,21 +210,23 @@ class SLine(Line):
     @staticmethod
     def deserialize(line: str) -> 'SLine':
         line_elements = line.rstrip().split("\t")
-        if len(line_elements) < SLine._LINE_ELEMENTS:
+
+        if len(line_elements) != len(_SLineColumns):
             raise ms2_exceptions.Ms2FileDeserializationSLineException(_line=line)
-        low_scan = int(line_elements[SLine._LOW_SCAN_INDEX])
-        high_scan = int(line_elements[SLine._HIGH_SCAN_INDEX])
-        mz = float(line_elements[SLine._MZ_INDEX])
+
+        low_scan = int(line_elements[_SLineColumns.low_scan.value])
+        high_scan = int(line_elements[_SLineColumns.high_scan.value])
+        mz = float(line_elements[_SLineColumns.mz.value])
+
         return SLine(low_scan, high_scan, mz)
 
     def serialize(self):
-        line_elements = ["S",
-                         f"{self.low_scan:0{SLine.LOW_SCAN_LENGTH}d}",
-                         f"{self.high_scan:0{SLine.HIGH_SCAN_LENGTH}d}",
-                         f"{self.mz:.{SLine.MZ_PRECISION}f}"
-                         ]
+        line_elements = [None] * len(_SLineColumns)
+        line_elements[_SLineColumns.letter.value] = "S"
+        line_elements[_SLineColumns.low_scan.value] = f"{self.low_scan:0{SLine.LOW_SCAN_LENGTH}d}"
+        line_elements[_SLineColumns.high_scan.value] = f"{self.high_scan:0{SLine.HIGH_SCAN_LENGTH}d}"
+        line_elements[_SLineColumns.mz.value] = f"{self.mz:.{SLine.MZ_PRECISION}f}"
         line_elements = [str(elem) for elem in line_elements]
-
         return '\t'.join(line_elements) + '\n'
 
 
@@ -241,9 +256,67 @@ class Ms2Spectra:
     def get_i_line_dict(self):
         return {i_line.keyword: i_line.value for i_line in self.i_lines}
 
-    @staticmethod
-    def deserialize(lines: List[str]):
-        pass
+    def get_i_line_value(self, keyword) -> Union[str, None]:
+        i_line_dict = self.get_i_line_dict()
+        if keyword in i_line_dict:
+            return i_line_dict[keyword]
+        return None
+
+    def get_retention_time(self, keyword=None) -> Union[float, None]:
+        if keyword is None:
+            keyword = ILine.RETENTION_TIME_KEYWORD
+
+        val = self.get_i_line_value(keyword)  # none/str
+        return float(val) if val else val
+
+    def get_collision_energy(self, keyword=None) -> Union[float, None]:
+        if keyword is None:
+            keyword = ILine.COLLISION_ENERGY_KEYWORD
+
+        val = self.get_i_line_value(keyword)  # none/str
+        return float(val) if val else val
+
+    def get_OOK0(self, keyword=None) -> Union[float, None]:
+        if keyword is None:
+            keyword = ILine.OOK0_KEYWORD
+
+        val = self.get_i_line_value(keyword)  # none/str
+        return float(val) if val else val
+
+    def get_CCS(self, keyword=None) -> Union[float, None]:
+        if keyword is None:
+            keyword = ILine.CCS_KEYWORD
+
+        val = self.get_i_line_value(keyword)  # none/str
+        return float(val) if val else val
+
+    def get_precursor_intensity(self, keyword=None) -> Union[float, None]:
+        if keyword is None:
+            keyword = ILine.PRECURSOR_INTENSITY_KEYWORD
+
+        val = self.get_i_line_value(keyword)  # none/str
+        return float(val) if val else val
+
+    def get_OOK0_spectra(self, keyword=None) -> Union[List[float], None]:
+        if keyword is None:
+            keyword = ILine.OOK0_SPECTRA_KEYWORD
+
+        val = self.get_i_line_value(keyword)  # none/str
+        return [float(i) for i in ast.literal_eval(val)] if val else val
+
+    def get_CCS_spectra(self, keyword=None) -> Union[List[float], None]:
+        if keyword is None:
+            keyword = ILine.CCS_SPECTRA_KEYWORD
+
+        val = self.get_i_line_value(keyword)  # none/str
+        return [float(i) for i in ast.literal_eval(val)] if val else val
+
+    def get_intensity_spectra(self, keyword=None) -> Union[List[float], None]:
+        if keyword is None:
+            keyword = ILine.INTENSITY_SPECTRA_KEYWORD
+
+        val = self.get_i_line_value(keyword)  # none/str
+        return [float(i) for i in ast.literal_eval(val)] if val else val
 
     def serialize(self) -> str:
         lines = [self.s_line] + self.i_lines + [self.z_line] + self.peak_lines

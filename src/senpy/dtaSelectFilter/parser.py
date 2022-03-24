@@ -1,8 +1,4 @@
-from senpy.util import LineSerializer
-from senpy.dtaSelectFilter.lines import LocusLine
-from senpy.dtaSelectFilter.serializer import UniqueLineSerializer_version_2_1_12, LocusLineSerializer_version_2_1_12, \
-    LocusLineSerializer_version_2_1_13, UniqueLineSerializer_version_2_1_13
-
+from senpy.dtaSelectFilter.lines import ProteinLine, DTAFilterResult, PeptideLine
 from enum import Enum
 
 
@@ -12,35 +8,16 @@ class FileState(Enum):
     INFO = 3
 
 
-def get_unique_line_serializer_by_version(version: str) -> LineSerializer:
-    if version == "v2.1.12":
-        return UniqueLineSerializer_version_2_1_12
-    elif version == "v2.1.13":
-        return UniqueLineSerializer_version_2_1_13
-    else:
-        print("version: ", version)
-        raise NotImplementedError
-
-
-def get_locus_line_serializer_by_version(version: str) -> LineSerializer:
-    if version == "v2.1.12":
-        return LocusLineSerializer_version_2_1_12
-    elif version == "v2.1.13":
-        return LocusLineSerializer_version_2_1_13
-    else:
-        print("version: ", version)
-        raise NotImplementedError
-
-
-def parse_file(dta_select_filter_file_path: str) -> ([str], [LocusLine], [str]):
+def parse_file(dta_select_filter_file_path: str) -> [DTAFilterResult]:
     """
-    Return list of S_lines and H_lines
+    Return list of FilteredProteinResult's
     """
-    h_lines, locus_lines, end_lines = [], [], []
+    dta_filter_results = []
     file_state = FileState.HEADER
+    version = None
 
-    unique_line_serializer = None
-    locus_line_serializer = None
+    protein_line = None
+    peptide_lines = []
 
     with open(dta_select_filter_file_path) as file:
         for line in file:
@@ -52,32 +29,31 @@ def parse_file(dta_select_filter_file_path: str) -> ([str], [LocusLine], [str]):
                 continue
 
             if len(line_elements) > 1 and line_elements[1] == "Proteins":
+                dta_filter_results.append(DTAFilterResult(protein_line, peptide_lines))
                 file_state = FileState.INFO
                 continue
 
             if file_state == FileState.HEADER:
-                h_lines.append(line)
                 if line[:9] == 'DTASelect':
                     version = line.split(" ")[1].rstrip()
                     print("version: ", version)
-                    unique_line_serializer = get_unique_line_serializer_by_version(version)
-                    locus_line_serializer = get_locus_line_serializer_by_version(version)
 
             if file_state == FileState.DATA:
                 if line_elements[0] == '' or line_elements[0] == '*':
-                    unique_line = unique_line_serializer.deserialize(line)
-                    locus_lines[-1].unique_lines.append(unique_line)
+                    peptide_lines.append(PeptideLine.deserialize(line, version=version))
                 else:
-                    locus_line = locus_line_serializer.deserialize(line)
-                    locus_lines.append(locus_line)
+                    if protein_line is not None:
+                        dta_filter_results.append(DTAFilterResult(protein_line, peptide_lines))
+                        peptide_lines = []
+                    protein_line = ProteinLine.deserialize(line, version=version)
 
             if file_state == FileState.INFO:
-                end_lines.append(line)
+                continue
 
-    return h_lines, locus_lines, end_lines
+    return dta_filter_results
 
 
-def write_file(h_lines: [str], locus_lines: [LocusLine], end_lines: [str], out_file_path: str) -> None:
+def write_file(h_lines: [str], locus_lines: [ProteinLine], end_lines: [str], out_file_path: str) -> None:
     """
     Write Sqt file from hlines and slines
     """
@@ -94,7 +70,7 @@ def write_file(h_lines: [str], locus_lines: [LocusLine], end_lines: [str], out_f
         for locus_line in locus_lines:
             line = locus_line_serializer.serialize(locus_line)
             file.write(line)
-            for unique_line in locus_line.unique_lines:
+            for unique_line in locus_line.peptide_lines:
                 line = unique_line_serializer.serialize(unique_line)
                 file.write(line)
 

@@ -120,7 +120,7 @@ def get_fragment_ions_information(ms2_file, dta_select_filter_file, fragment_typ
     dta_filter_dict = {}
     # map appropriate file scan numbers to unique lines
     for locus_line in locus_lines:
-        for unique_line in locus_line.unique_lines:
+        for unique_line in locus_line.peptide_lines:
             if unique_line.file_name == ms2_file_name:
                 dta_filter_dict[unique_line.low_scan] = unique_line
     print(f"{len(dta_filter_dict)} ms2 scans identified in dta-filter")

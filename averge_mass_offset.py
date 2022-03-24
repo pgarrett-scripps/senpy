@@ -25,7 +25,7 @@ def dta_select(dta_select_filter_file):
     ppms = []
     h_lines, locus_lines, end_lines = parse_dta_filter_file(dta_select_filter_file)
     for locus_line in locus_lines:
-        for unique_line in locus_line.unique_lines:
+        for unique_line in locus_line.peptide_lines:
             ppms.append(unique_line.ppm)
 
     plt.hist(ppms)

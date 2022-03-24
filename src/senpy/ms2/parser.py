@@ -1,5 +1,7 @@
 from typing import List
 
+from tqdm import tqdm
+
 from senpy.ms2.lines import SLine, HLine, ZLine, PeakLine, ILine, Ms2Spectra, parse_ms2_line
 
 
@@ -10,16 +12,16 @@ def read_file(file_path) -> (List[HLine], List[Ms2Spectra]):
     :param:     file_path:          str to the path for the sqt file
     :return:    (List[HLine], List[Ms2Spectra]):          lists of HLines and Ms2Spectra
     """
-    h_lines, ms2_spectras = [], []
+    ms2_spectras = []
 
     with open(file_path) as file:
         s_line, z_line, i_lines, peak_lines = None, None, [], []
-        for line in file:
+        for line in tqdm(file):
             if line == "" or line == "\n":
                 continue
             ms2_line = parse_ms2_line(line)
             if isinstance(ms2_line, HLine):
-                h_lines.append(ms2_line)
+                continue
             elif isinstance(ms2_line, SLine):
                 if s_line is not None:
                     ms2_spectras.append(Ms2Spectra(s_line=s_line,
@@ -44,7 +46,7 @@ def read_file(file_path) -> (List[HLine], List[Ms2Spectra]):
                                        )
                             )
 
-        return h_lines, ms2_spectras
+        return ms2_spectras
 
 
 def read_file_incrementally(file_path) -> List[Ms2Spectra]:

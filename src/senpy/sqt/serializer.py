@@ -1,7 +1,7 @@
 from senpy.util import LineSerializer
-from sqt import SqtFileDeserializationLLineException, SqtFileDeserializationMLineException, \
+from senpy.sqt.exceptions import SqtFileDeserializationLLineException, SqtFileDeserializationMLineException, \
     SqtFileDeserializationSLineException
-from sqt.lines import SLine, MLine, LLine
+from senpy.sqt.lines import SLine, MLine, LLine
 
 
 class LLineSerializer(LineSerializer):

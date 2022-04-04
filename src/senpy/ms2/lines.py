@@ -245,6 +245,8 @@ class Ms2Spectra:
     z_line: ZLine
     peak_lines: List[PeakLine]
 
+    i_line_dict = None
+
     __slots__ = 's_line', 'i_lines', 'z_line', 'peak_lines'
 
     def get_mz_spectra(self):
@@ -254,6 +256,8 @@ class Ms2Spectra:
         return [peak_line.intensity for peak_line in self.peak_lines]
 
     def get_i_line_dict(self):
+        if self.i_line_dict:
+            return self.i_line_dict
         return {i_line.keyword: i_line.value for i_line in self.i_lines}
 
     def get_i_line_value(self, keyword) -> Union[str, None]:

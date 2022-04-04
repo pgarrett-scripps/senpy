@@ -1,3 +1,5 @@
 numpy~=1.20.1
 setuptools~=52.0.0
 matplotlib~=3.3.4
+senpy~=0.0.1
+tqdm~=4.59.0

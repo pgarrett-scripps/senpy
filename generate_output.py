@@ -4,7 +4,8 @@ import os.path
 from tqdm import tqdm
 
 from senpy.ms2.lines import ILine
-from senpy.ms2.parser import read_file_incrementally as parse_ms2_incrementally
+from senpy.ms2_fast.parser import read_file
+from senpy.ms2_fast.parser import read_file_incrementally as parse_ms2_incrementally
 from senpy.dtaSelectFilter.parser import parse_file as parse_filter
 from senpy.out.line import OutLine
 from senpy.out.parser import write_file
@@ -59,23 +60,28 @@ def generate_output(ms2_path=None,
     peptide_line_by_scan_number_map = {}
     dta_filter_results = parse_filter(filter_path)
 
+
     print("DTASelect-filter")
     for filter_result in dta_filter_results:
         for peptide_line in filter_result.peptide_lines:
             if peptide_line.file_name == ms2_file_name:
                 peptide_line_by_scan_number_map[peptide_line.low_scan] = peptide_line
+    print(len(peptide_line_by_scan_number_map))
 
-    print("DTASelect-filter")
+    print("MS2")
 
     out_lines = []
-    for ms2_spectra in tqdm(parse_ms2_incrementally(ms2_path)):
-        if ms2_spectra.s_line.low_scan in peptide_line_by_scan_number_map:
-            peptide_line = peptide_line_by_scan_number_map[ms2_spectra.s_line.low_scan]
+    ms2_spectras = read_file(ms2_path)
+    for ms2_spectra in tqdm(ms2_spectras):
+        ms2_scan_number = int(ms2_spectra.s_line.get_low_scan())
+        if ms2_scan_number in peptide_line_by_scan_number_map:
+            peptide_line = peptide_line_by_scan_number_map[ms2_scan_number]
+
             out_line = OutLine(scan_number=peptide_line.low_scan,
                                sequence=peptide_line.sequence,
                                charge=peptide_line.charge,
-                               mass=ms2_spectra.z_line.mass,
-                               mz=ms2_spectra.s_line.mz,
+                               mass=ms2_spectra.z_line.get_mass(),
+                               mz=ms2_spectra.s_line.get_mz(),
                                x_corr=peptide_line.x_corr,
                                retention_time=ms2_spectra.get_retention_time(keyword=retention_time_keyword),
                                OOK0=ms2_spectra.get_OOK0(keyword=OOK0_keyword),
@@ -86,9 +92,11 @@ def generate_output(ms2_path=None,
                                OOK0_spectra=ms2_spectra.get_OOK0_spectra(keyword=OOK0_spectra_keyword),
                                CCS_spectra=ms2_spectra.get_CCS_spectra(keyword=CCS_spectra_keyword),
                                intensity_spectra=ms2_spectra.get_intensity_spectra(keyword=intensity_spectra_keyword))
+
+
             out_lines.append(out_line)
 
-        write_file(out_lines, out_path)
+    write_file(out_lines, out_path)
 
 
 if __name__ == '__main__':

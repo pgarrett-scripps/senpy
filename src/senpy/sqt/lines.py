@@ -5,7 +5,7 @@ from senpy.util import Line
 
 
 @dataclass
-class LLine(Line):
+class LLine:
     """
     Class keeping track of sqt L lines.
 
@@ -21,7 +21,7 @@ class LLine(Line):
 
 
 @dataclass
-class MLine(Line):
+class MLine:
     """
     Class keeping track of sqt M lines.
 
@@ -72,7 +72,7 @@ class MLine(Line):
                    self.tims_b_score_best_m == other.tims_b_score_best_m
 
 @dataclass
-class SLine(Line):
+class SLine:
     """
     Class keeping track of sqt S lines.
 

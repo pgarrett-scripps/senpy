@@ -100,22 +100,22 @@ class OutLine(Line):
         line_elements[_OutLineColumns.scan_number.value] = self.scan_number
         line_elements[_OutLineColumns.sequence.value] = self.sequence
         line_elements[_OutLineColumns.charge.value] = f"{self.charge}"
-        line_elements[_OutLineColumns.mass.value] = f"{self.mass:.{self.MASS_PRECISION}f}"
-        line_elements[_OutLineColumns.mz.value] = f"{self.mz:.{self.MZ_PRECISION}f}"
-        line_elements[_OutLineColumns.x_corr.value] = f"{self.x_corr:.{self.X_CORR_PRECISION}f}"
-        line_elements[_OutLineColumns.retention_time.value] = f"{self.retention_time:.{self.RETENTION_TIME_PRECISION}f}"
-        line_elements[_OutLineColumns.OOK0.value] = f"{self.OOK0:.{self.OOK0_PRECISION}f}"
-        line_elements[_OutLineColumns.CCS.value] = f"{self.CCS:.{self.CCS_PRECISION}f}"
+        line_elements[_OutLineColumns.mass.value] = f"{self.mass:.{self.MASS_PRECISION}f}" if type(self.mass) != str else self.mass
+        line_elements[_OutLineColumns.mz.value] = f"{self.mz:.{self.MZ_PRECISION}f}" if type(self.mz) != str else self.mz
+        line_elements[_OutLineColumns.x_corr.value] = f"{self.x_corr:.{self.X_CORR_PRECISION}f}" if type(self.x_corr) != str else self.x_corr
+        line_elements[_OutLineColumns.retention_time.value] = f"{self.retention_time:.{self.RETENTION_TIME_PRECISION}f}" if type(self.retention_time) != str else self.retention_time
+        line_elements[_OutLineColumns.OOK0.value] = f"{self.OOK0:.{self.OOK0_PRECISION}f}" if type(self.OOK0) != str else self.OOK0
+        line_elements[_OutLineColumns.CCS.value] = f"{self.CCS:.{self.CCS_PRECISION}f}" if type(self.CCS) != str else self.CCS
         line_elements[_OutLineColumns.collision_energy.value] = \
-            f"{self.collision_energy:.{self.COLLISION_ENERGY_PRECISION}f}"
+            f"{self.collision_energy:.{self.COLLISION_ENERGY_PRECISION}f}" if type(self.collision_energy) != str else self.collision_energy
         line_elements[_OutLineColumns.precursor_intensity.value] = \
-            f"{self.precursor_intensity:.{self.INTENSITY_PRECISION}f} "
+            f"{self.precursor_intensity:.{self.INTENSITY_PRECISION}f} " if type(self.precursor_intensity) != str else self.precursor_intensity
         line_elements[_OutLineColumns.OOK0_spectra.value] = \
-            str([f"{val:.{self.OOK0_PRECISION}f}" for val in self.OOK0_spectra]).replace("'", "")
+            str([f"{val:.{self.OOK0_PRECISION}f}" for val in self.OOK0_spectra]).replace("'", "") if type(self.OOK0_spectra) != str else self.OOK0_spectra
         line_elements[_OutLineColumns.CCS_spectra.value] = \
-            str([f"{val:.{self.CCS_PRECISION}f}" for val in self.CCS_spectra]).replace("'", "")
+            str([f"{val:.{self.CCS_PRECISION}f}" for val in self.CCS_spectra]).replace("'", "") if type(self.CCS_spectra) != str else self.CCS_spectra
         line_elements[_OutLineColumns.intensity_spectra.value] = \
-            str([f"{val:.{self.INTENSITY_PRECISION}f}" for val in self.intensity_spectra]).replace("'", "")
+            str([f"{val:.{self.INTENSITY_PRECISION}f}" for val in self.intensity_spectra]).replace("'", "") if type(self.intensity_spectra) != str else self.intensity_spectra
         line_elements = [str(elem) for elem in line_elements]
 
         return '\t'.join(line_elements) + '\n'

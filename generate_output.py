@@ -1,6 +1,8 @@
 import argparse
+import ast
 import os.path
 
+import numpy as np
 from tqdm import tqdm
 
 from senpy.ms2.lines import ILine
@@ -43,6 +45,10 @@ def parse_args():
     return _parser.parse_args()
 
 
+def encode_string_as_array(string):
+    return str(np.array([val for val in ast.literal_eval(string)], dtype=np.float32).tobytes())
+
+
 def generate_output(ms2_path=None,
                     filter_path=None,
                     out_path=None,
@@ -76,6 +82,7 @@ def generate_output(ms2_path=None,
         ms2_scan_number = int(ms2_spectra.s_line.get_low_scan())
         if ms2_scan_number in peptide_line_by_scan_number_map:
             peptide_line = peptide_line_by_scan_number_map[ms2_scan_number]
+
 
             out_line = OutLine(scan_number=peptide_line.low_scan,
                                sequence=peptide_line.sequence,

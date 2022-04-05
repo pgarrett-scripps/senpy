@@ -8,13 +8,15 @@ class FileState(Enum):
     INFO = 3
 
 
-def parse_file(dta_select_filter_file_path: str) -> [DTAFilterResult]:
+def parse_file(dta_select_filter_file_path: str, version: str = None) -> ([str], [DTAFilterResult], [str]):
     """
     Return list of FilteredProteinResult's
     """
     dta_filter_results = []
+    h_lines = []
+    end_lines = []
+
     file_state = FileState.HEADER
-    version = None
 
     protein_line = None
     peptide_lines = []
@@ -25,18 +27,20 @@ def parse_file(dta_select_filter_file_path: str) -> [DTAFilterResult]:
 
             # update file state
             if len(line_elements) > 0 and line_elements[0] == 'Unique':
+                h_lines.append(line)
                 file_state = FileState.DATA
                 continue
 
             if len(line_elements) > 1 and line_elements[1] == "Proteins":
                 dta_filter_results.append(DTAFilterResult(protein_line, peptide_lines))
                 file_state = FileState.INFO
-                continue
 
             if file_state == FileState.HEADER:
+                h_lines.append(line)
                 if line[:9] == 'DTASelect':
-                    version = line.split(" ")[1].rstrip()
-                    print("version: ", version)
+                    if version is None:
+                        version = line.split(" ")[1].rstrip()
+                        print("version: ", version)
 
             if file_state == FileState.DATA:
                 if line_elements[0] == '' or line_elements[0] == '*':
@@ -48,36 +52,38 @@ def parse_file(dta_select_filter_file_path: str) -> [DTAFilterResult]:
                     protein_line = ProteinLine.deserialize(line, version=version)
 
             if file_state == FileState.INFO:
-                continue
+                end_lines.append(line)
 
-    return dta_filter_results
+    return h_lines, dta_filter_results, end_lines
 
 
-def write_file(h_lines: [str], locus_lines: [ProteinLine], end_lines: [str], out_file_path: str) -> None:
+def write_file(h_lines: [str], dta_filter_results: [DTAFilterResult], end_lines: [str], out_file_path: str, version: str = None) -> None:
     """
     Write Sqt file from hlines and slines
     """
-    unique_line_serializer = None
-    locus_line_serializer = None
+
     with open(out_file_path, "w") as file:
+
         for h_line in h_lines:
             file.write(h_line)
             if h_line[:9] == 'DTASelect':
-                version = h_line.split(" ")[1].rstrip()
-                unique_line_serializer = get_unique_line_serializer_by_version(version)
-                locus_line_serializer = get_locus_line_serializer_by_version(version)
+                if version is None:
+                    version = h_line.split(" ")[1].rstrip()
+                    print("version: ", version)
 
-        for locus_line in locus_lines:
-            line = locus_line_serializer.serialize(locus_line)
-            file.write(line)
-            for unique_line in locus_line.peptide_lines:
-                line = unique_line_serializer.serialize(unique_line)
-                file.write(line)
+        for dta_filter_result in dta_filter_results:
+            file.write(dta_filter_result.serialize(version))
 
         for end_line in end_lines:
             file.write(end_line)
 
 
 if __name__ == "__main__":
-    h_lines, locus_lines, end_lines = parse_file("/sample_frag_ion\\DTASelect-filter.txt")
+
+    h_lines, locus_lines, end_lines = parse_file("C:\\Users\\Ty\\repos\\senpy_package\\sample_files\\DTASelect-filter.txt")
+    print("write")
     write_file(h_lines, locus_lines, end_lines, "tmp_out.dta")
+
+    h_lines, locus_lines, end_lines = parse_file("C:\\Users\\Ty\\repos\\senpy_package\\sample_files\\paser_dta_select.txt", version="v2.1.12_paser")
+    print("write")
+    write_file(h_lines, locus_lines, end_lines, "tmp_out.dta", version="v2.1.12_paser")

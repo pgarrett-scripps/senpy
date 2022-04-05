@@ -16,7 +16,7 @@ class _PeakLineColumns(Enum):
 @dataclass
 class PeakLine(Line):
     """
-    Class for keeping track of peak lines
+    Class for serializing/deserializing PeakLines
 
     Example Z_line:
         [mz] [intensity]
@@ -36,6 +36,7 @@ class PeakLine(Line):
         line_elements = line.rstrip().split(" ")
         if len(line_elements) != len(_PeakLineColumns):
             raise ms2_exceptions.Ms2FileDeserializationPeakLineException(_line=line)
+
         mz = np.float32(line_elements[_PeakLineColumns.mz.value])
         intensity = np.float32(line_elements[_PeakLineColumns.intensity.value])
 
@@ -44,10 +45,18 @@ class PeakLine(Line):
 
     def serialize(self) -> str:
         line_elements = [None] * len(_PeakLineColumns)
-        line_elements[_PeakLineColumns.mz.value] = f"{self.mz:.{PeakLine.MZ_PRECISION}f}"
-        line_elements[_PeakLineColumns.intensity.value] = f"{self.mz:.{PeakLine.INTENSITY_PRECISION}f}"
-        line_elements = [str(elem) for elem in line_elements]
+        line_elements[_PeakLineColumns.mz.value] = self.serialize_mz(self.mz, PeakLine.MZ_PRECISION)
+        line_elements[_PeakLineColumns.intensity.value] = self.serialize_intensity(self.intensity,
+                                                                                   PeakLine.INTENSITY_PRECISION)
         return ' '.join(line_elements) + '\n'
+
+    @staticmethod
+    def serialize_mz(mz, precision):
+        return f"{mz:.{precision}f}"
+
+    @staticmethod
+    def serialize_intensity(intensity, precision):
+        return f"{intensity:.{precision}f}"
 
 
 @dataclass
@@ -72,8 +81,6 @@ class HLine(Line):
         line_elements = ["H",
                          self.info
                          ]
-        line_elements = [str(elem) for elem in line_elements]
-
         return '\t'.join(line_elements) + '\n'
 
 
@@ -114,10 +121,17 @@ class ZLine:
     def serialize(self) -> str:
         line_elements = [None]*len(_ZLineColumns)
         line_elements[_ZLineColumns.letter.value] = "Z"
-        line_elements[_ZLineColumns.charge.value] = f"{self.charge}"
-        line_elements[_ZLineColumns.mass.value] = f"{self.mass:.{ZLine.MASS_PRECISION}f}"
-        line_elements = [str(elem) for elem in line_elements]
+        line_elements[_ZLineColumns.charge.value] = self.serialize_charge(self.charge)
+        line_elements[_ZLineColumns.mass.value] = self.serialize_mass(self.mass, ZLine.MASS_PRECISION)
         return '\t'.join(line_elements) + '\n'
+
+    @staticmethod
+    def serialize_charge(charge):
+        return f"{charge}"
+
+    @staticmethod
+    def serialize_mass(mass, precision):
+        return f"{mass:.{precision}f}"
 
 
 class _ILineColumns(Enum):
@@ -176,7 +190,6 @@ class ILine(Line):
         line_elements[_ILineColumns.letter.value] = "I"
         line_elements[_ILineColumns.keyword.value] = self.keyword
         line_elements[_ILineColumns.value.value] = self.value
-        line_elements = [str(elem) for elem in line_elements]
         return '\t'.join(line_elements) + '\n'
 
 
@@ -223,11 +236,22 @@ class SLine(Line):
     def serialize(self):
         line_elements = [None] * len(_SLineColumns)
         line_elements[_SLineColumns.letter.value] = "S"
-        line_elements[_SLineColumns.low_scan.value] = f"{self.low_scan:0{SLine.LOW_SCAN_LENGTH}d}"
-        line_elements[_SLineColumns.high_scan.value] = f"{self.high_scan:0{SLine.HIGH_SCAN_LENGTH}d}"
-        line_elements[_SLineColumns.mz.value] = f"{self.mz:.{SLine.MZ_PRECISION}f}"
-        line_elements = [str(elem) for elem in line_elements]
+        line_elements[_SLineColumns.low_scan.value] = self.serialize_low_scan(self.low_scan, SLine.LOW_SCAN_LENGTH)
+        line_elements[_SLineColumns.high_scan.value] = self.serialize_high_scan(self.high_scan, SLine.HIGH_SCAN_LENGTH)
+        line_elements[_SLineColumns.mz.value] = self.serialize_mz(self.mz, SLine.MZ_PRECISION)
         return '\t'.join(line_elements) + '\n'
+
+    @staticmethod
+    def serialize_low_scan(low_scan, max_length):
+        return f"{low_scan:0{max_length}d}"
+
+    @staticmethod
+    def serialize_high_scan(high_scan, max_length):
+        return f"{high_scan:0{max_length}d}"
+
+    @staticmethod
+    def serialize_mz(mz, precision):
+        return f"{mz:.{precision}f}"
 
 
 @dataclass

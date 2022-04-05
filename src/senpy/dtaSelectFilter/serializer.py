@@ -23,19 +23,19 @@ class LocusLineSerializer_version_2_1_13(LineSerializer):
         return line
 
     @staticmethod
-    def serialize(locus_line: ProteinLine) -> str:
+    def serialize(line: ProteinLine) -> str:
         line_elements = [
-            locus_line.locus_name,
-            locus_line.sequence_count,
-            locus_line.spectrum_count,
-            str(round(locus_line.sequence_coverage, 1)) + "%",
-            locus_line.length,
-            locus_line.molWt,
-            round(locus_line.pi, 1),
-            locus_line.validation_status,
-            round(locus_line.nsaf, 10),
-            round(locus_line.empai, 6),
-            locus_line.description_name
+            line.locus_name,
+            line.sequence_count,
+            line.spectrum_count,
+            str(round(line.sequence_coverage, 1)) + "%",
+            line.length,
+            line.molWt,
+            round(line.pi, 1),
+            line.validation_status,
+            round(line.nsaf, 10),
+            round(line.empai, 6),
+            line.description_name
         ]
 
         line_elements = [str(elem) for elem in line_elements]

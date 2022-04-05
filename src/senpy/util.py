@@ -37,4 +37,8 @@ def cast_str(val: Any) -> Union[str, None]:
     return str(val) if val else None
 
 
+def serialize_float(val, precision):
+    return f"{val:.{precision}f}"
+
+
 

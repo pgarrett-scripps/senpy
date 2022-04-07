@@ -50,6 +50,25 @@ def is_valid_sequence(sequence):
     return bool(re.match('^[ARNDCEQGHILKMFPSTWYV]+$', sequence))
 
 
+mod_map = {}
+mod_map['(15.994915)'] = 'Oxidation'
+mod_map['(0.984016)'] = 'Deamidated'
+
+
+def convert_mod_sequence(sequence):
+    mods = []
+
+    for key in mod_map:
+        while sequence.find(key) != -1:
+            itr = 0
+            for aa in sequence[:sequence.find(key)]:
+                if aa in 'ARNDCEQGHILKMFPSTWYV':
+                    itr += 1
+            sequence = sequence.replace(key, "", 1)
+            mods.append((itr, mod_map[key]))
+    return mods, sequence
+
+
 def generate_rt_score_sqt(sqt_file, ms2_file, retention_time_keyword):
     scan_num_to_retention_time_map = get_scan_num_to_retention_time_map(ms2_file, retention_time_keyword)
 
@@ -69,7 +88,7 @@ def generate_rt_score_sqt(sqt_file, ms2_file, retention_time_keyword):
     align_retention_times = []
     for s_line in s_lines:
         if len(s_line.m_lines) > 0 and s_line.m_lines[0].xcorr >= x_corr_95_percentile and not s_line.m_lines[0].is_reverse():
-            align_sequences.append(s_line.m_lines[0].sequence.split(".")[1] )
+            align_sequences.append(s_line.m_lines[0].sequence.split(".")[1])
             align_retention_times.append(scan_num_to_retention_time_map[s_line.low_scan])
 
     # Calibrate DeepLC with best sequences

@@ -1,8 +1,10 @@
-from senpy.sqt.serializer import SLineSerializer, MLineSerializer, LLineSerializer
-from senpy.sqt.lines import SLine
+from tqdm import tqdm
+
+from senpy.sqt.lines import SLine, parse_sqt_line, MLine, LLine
+from senpy.util import HLine
 
 
-def read_file(file_path: str) -> ([str], [SLine]):
+def read_file(file_path: str, version='auto') -> ([str], [SLine]):
     """
     Return list of H_lines and S_lines, from provided sqt file. Will always
     return correctly and fully read Precursors/PSMCandidates/Locus' until
@@ -12,21 +14,27 @@ def read_file(file_path: str) -> ([str], [SLine]):
     :return:    ([str], [SLine]):   lists of Hlines and SLines
     """
     h_lines, s_lines = [], []
+
     with open(file_path) as file:
-        for line in file:
-            if line[0] == "H":
-                h_lines.append(line)
-            if line[0] == "S":
-                s_lines.append(SLineSerializer.deserialize(line))
-            if line[0] == "M":
-                s_lines[-1].m_lines.append(MLineSerializer.deserialize(line))
-            if line[0] == "L":
-                s_lines[-1].m_lines[-1].l_lines.append(LLineSerializer.deserialize(line))
+        for line in tqdm(file):
 
-    return h_lines, s_lines
+            if line == "" or line == "\n":
+                continue
+
+            sqt_line = parse_sqt_line(line)
+            if isinstance(sqt_line, HLine):
+                h_lines.append(sqt_line)
+            elif isinstance(sqt_line, SLine):
+                s_lines.append(sqt_line)
+            elif isinstance(sqt_line, MLine):
+                s_lines[-1].m_lines.append(sqt_line)
+            elif isinstance(sqt_line, LLine):
+                s_lines[-1].m_lines[-1].l_lines.append(sqt_line)
+
+        return h_lines, s_lines
 
 
-def write_file(h_lines: [str], s_lines: [SLine], out_file_path: str) -> None:
+def write_file(h_lines: [HLine], s_lines: [SLine], out_file_path: str, version='auto') -> None:
     """
     Write Sqt file from hlines and slines
     :param:     h_lines:    [str],      list of header lines
@@ -36,12 +44,12 @@ def write_file(h_lines: [str], s_lines: [SLine], out_file_path: str) -> None:
     with open(out_file_path, "w") as file:
 
         for h_line in h_lines:
-            file.write(h_line)
+            file.write(h_line.serialize(version=version))
 
         for s_line in s_lines:
-            file.write(SLineSerializer.serialize(s_line))
+            file.write(s_line.serialize(version=version))
             for m_line in s_line.m_lines:
-                file.write(MLineSerializer.serialize(m_line))
+                file.write(m_line.serialize(version=version))
                 for l_line in m_line.l_lines:
-                    file.write(LLineSerializer.serialize(l_line))
+                    file.write(l_line.serialize(version=version))
             file.write("\n")

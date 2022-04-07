@@ -12,7 +12,7 @@ def read_file(file_path) -> (List[HLine], List[Ms2Spectra]):
     :param:     file_path:          str to the path for the sqt file
     :return:    (List[HLine], List[Ms2Spectra]):          lists of HLines and Ms2Spectra
     """
-    ms2_spectras = []
+    h_lines, ms2_spectras = [], []
 
     with open(file_path) as file:
         s_line, z_line, i_lines, peak_lines = None, None, [], []
@@ -21,6 +21,7 @@ def read_file(file_path) -> (List[HLine], List[Ms2Spectra]):
                 continue
             ms2_line = parse_ms2_line(line)
             if isinstance(ms2_line, HLine):
+                h_lines.append(ms2_line)
                 continue
             elif isinstance(ms2_line, SLine):
                 if s_line is not None:
@@ -46,7 +47,7 @@ def read_file(file_path) -> (List[HLine], List[Ms2Spectra]):
                                        )
                             )
 
-        return ms2_spectras
+        return h_lines, ms2_spectras
 
 
 def read_file_incrementally(file_path) -> List[Ms2Spectra]:

@@ -23,3 +23,12 @@ class SqtFileDeserializationLLineException(Exception):
 
     def __repr__(self):
         return f"Error deserializing L-line: '{self.line}'"
+
+
+class SqtFileDeserializationUnsupportedLineException(Exception):
+
+    def __init__(self, _line: str):
+        self.line = _line
+
+    def __repr__(self):
+        return f"Unsupported sqt line type: '{self.line}'"

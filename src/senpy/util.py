@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from typing import Any, Union
 
 
@@ -39,6 +40,32 @@ def cast_str(val: Any) -> Union[str, None]:
 
 def serialize_float(val, precision):
     return f"{val:.{precision}f}"
+
+
+@dataclass
+class HLine(Line):
+    """
+    Class for storing H line Information
+
+    Example H Line:
+        H   [info]
+    """
+
+    LETTER = "H"
+    info: str
+
+    __slots__ = 'info'
+
+    @staticmethod
+    def deserialize(line: str, version=None) -> 'HLine':
+        line_elements = line.rstrip().split("\t")
+        return HLine("\t".join(line_elements[1:]))
+
+    def serialize(self, version=None) -> str:
+        line_elements = ["H",
+                         self.info
+                         ]
+        return '\t'.join(line_elements) + '\n'
 
 
 

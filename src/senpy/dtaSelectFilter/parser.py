@@ -85,5 +85,4 @@ if __name__ == "__main__":
     write_file(h_lines, locus_lines, end_lines, "tmp_out.dta")
 
     h_lines, locus_lines, end_lines = parse_file("C:\\Users\\Ty\\repos\\senpy_package\\sample_files\\paser_dta_select.txt", version="v2.1.12_paser")
-    print("write")
     write_file(h_lines, locus_lines, end_lines, "tmp_out.dta", version="v2.1.12_paser")

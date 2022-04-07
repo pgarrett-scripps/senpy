@@ -91,13 +91,13 @@ def generate_output(ms2_path=None,
                                mz=ms2_spectra.s_line.get_mz(),
                                x_corr=peptide_line.x_corr,
                                retention_time=ms2_spectra.get_retention_time(keyword=retention_time_keyword),
-                               OOK0=ms2_spectra.get_OOK0(keyword=OOK0_keyword),
-                               CCS=ms2_spectra.get_CCS(keyword=CCS_keyword),
+                               OOK0=ms2_spectra.get_ook0(keyword=OOK0_keyword),
+                               CCS=ms2_spectra.get_ccs(keyword=CCS_keyword),
                                collision_energy=ms2_spectra.get_collision_energy(keyword=collision_energy_keyword),
                                precursor_intensity=ms2_spectra.get_precursor_intensity(
                                    keyword=precursor_intensity_keyword),
-                               OOK0_spectra=ms2_spectra.get_OOK0_spectra(keyword=OOK0_spectra_keyword),
-                               CCS_spectra=ms2_spectra.get_CCS_spectra(keyword=CCS_spectra_keyword),
+                               OOK0_spectra=ms2_spectra.get_ook0_spectra(keyword=OOK0_spectra_keyword),
+                               CCS_spectra=ms2_spectra.get_ccs_spectra(keyword=CCS_spectra_keyword),
                                intensity_spectra=ms2_spectra.get_intensity_spectra(keyword=intensity_spectra_keyword))
 
 

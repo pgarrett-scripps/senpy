@@ -40,4 +40,4 @@ class Ms2FileDeserializationUnsupportedLineException(Exception):
         self.line = _line
 
     def __repr__(self):
-        return f"Unsupported line type: '{self.line}'"
+        return f"Unsupported ms2 line type: '{self.line}'"

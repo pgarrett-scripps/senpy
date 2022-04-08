@@ -143,6 +143,7 @@ class ILine(Line):
     OOK0_SPECTRA_KEYWORD: ClassVar[str] = 'OOK0_Spectra'
     CCS_SPECTRA_KEYWORD: ClassVar[str] = 'CCS_Spectra'
     INTENSITY_SPECTRA_KEYWORD: ClassVar[str] = 'Intensity_Spectra'
+    MZ_SPECTRA_KEYWORD: ClassVar[str] = 'MZ_Spectra'
 
     __slots__ = 'keyword', 'value'
 

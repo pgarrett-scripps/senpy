@@ -131,9 +131,9 @@ class ILine(Line):
     # Keywords
     PARENT_ID_KEYWORD: ClassVar[str] = 'TIMSTOF_Parent_ID'
     PRECURSOR_ID_KEYWORD: ClassVar[str] = 'TIMSTOF_Precursor_ID'
-    OOK0_KEYWORD: ClassVar[str] = 'Ion Mobility'
+    OOK0_KEYWORD: ClassVar[str] = 'OOK0'
     CCS_KEYWORD: ClassVar[str] = 'CCS'
-    RETENTION_TIME_KEYWORD: ClassVar[str] = 'RetTime'
+    RETENTION_TIME_KEYWORD: ClassVar[str] = 'Retention_Time'
     COLLISION_ENERGY_KEYWORD: ClassVar[str] = 'Collision_Energy'
     ISOLATION_MZ_KEYWORD: ClassVar[str] = 'Isolation_Mz'
     ISOLATION_WIDTH_KEYWORD: ClassVar[str] = 'Isolation_Width'

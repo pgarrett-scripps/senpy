@@ -1,7 +1,9 @@
+from typing import List
+
 from senpy.out.line import OutLine
 
 
-def parse_file(file_path):
+def read_file(file_path: str) -> List[OutLine]:
     """
     Return list of out_lines and H_lines
     """

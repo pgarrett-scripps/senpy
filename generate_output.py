@@ -7,7 +7,6 @@ from tqdm import tqdm
 
 from senpy.ms2.lines import ILine
 from senpy.ms2_fast.parser import read_file
-from senpy.ms2_fast.parser import read_file_incrementally as parse_ms2_incrementally
 from senpy.dtaSelectFilter.parser import parse_file as parse_filter
 from senpy.out.line import OutLine
 from senpy.out.parser import write_file
@@ -45,27 +44,22 @@ def parse_args():
     return _parser.parse_args()
 
 
-def encode_string_as_array(string):
-    return str(np.array([val for val in ast.literal_eval(string)], dtype=np.float32).tobytes())
-
-
 def generate_output(ms2_path=None,
                     filter_path=None,
                     out_path=None,
                     retention_time_keyword=None,
-                    OOK0_keyword=None,
-                    CCS_keyword=None,
+                    ook0_keyword=None,
+                    ccs_keyword=None,
                     collision_energy_keyword=None,
                     precursor_intensity_keyword=None,
-                    OOK0_spectra_keyword=None,
-                    CCS_spectra_keyword=None,
+                    ook0_spectra_keyword=None,
+                    ccs_spectra_keyword=None,
                     intensity_spectra_keyword=None,
                     ):
     ms2_file_name = os.path.splitext(os.path.basename(ms2_path))[0]
 
     peptide_line_by_scan_number_map = {}
     dta_filter_results = parse_filter(filter_path)
-
 
     print("DTASelect-filter")
     for filter_result in dta_filter_results:
@@ -75,14 +69,12 @@ def generate_output(ms2_path=None,
     print(len(peptide_line_by_scan_number_map))
 
     print("MS2")
-
     out_lines = []
     ms2_spectras = read_file(ms2_path)
     for ms2_spectra in tqdm(ms2_spectras):
         ms2_scan_number = int(ms2_spectra.s_line.get_low_scan())
         if ms2_scan_number in peptide_line_by_scan_number_map:
             peptide_line = peptide_line_by_scan_number_map[ms2_scan_number]
-
 
             out_line = OutLine(scan_number=peptide_line.low_scan,
                                sequence=peptide_line.sequence,
@@ -91,15 +83,14 @@ def generate_output(ms2_path=None,
                                mz=ms2_spectra.s_line.get_mz(),
                                x_corr=peptide_line.x_corr,
                                retention_time=ms2_spectra.get_retention_time(keyword=retention_time_keyword),
-                               OOK0=ms2_spectra.get_ook0(keyword=OOK0_keyword),
-                               CCS=ms2_spectra.get_ccs(keyword=CCS_keyword),
+                               OOK0=ms2_spectra.get_ook0(keyword=ook0_keyword),
+                               CCS=ms2_spectra.get_ccs(keyword=ccs_keyword),
                                collision_energy=ms2_spectra.get_collision_energy(keyword=collision_energy_keyword),
                                precursor_intensity=ms2_spectra.get_precursor_intensity(
                                    keyword=precursor_intensity_keyword),
-                               OOK0_spectra=ms2_spectra.get_ook0_spectra(keyword=OOK0_spectra_keyword),
-                               CCS_spectra=ms2_spectra.get_ccs_spectra(keyword=CCS_spectra_keyword),
+                               OOK0_spectra=ms2_spectra.get_ook0_spectra(keyword=ook0_spectra_keyword),
+                               CCS_spectra=ms2_spectra.get_ccs_spectra(keyword=ccs_spectra_keyword),
                                intensity_spectra=ms2_spectra.get_intensity_spectra(keyword=intensity_spectra_keyword))
-
 
             out_lines.append(out_line)
 
@@ -117,11 +108,11 @@ if __name__ == '__main__':
                     args.filter,
                     args.out,
                     retention_time_keyword=args.retention_time_keyword,
-                    OOK0_keyword=args.OOK0_keyword,
-                    CCS_keyword=args.CCS_keyword,
+                    ook0_keyword=args.OOK0_keyword,
+                    ccs_keyword=args.CCS_keyword,
                     collision_energy_keyword=args.collision_energy_keyword,
                     precursor_intensity_keyword=args.precursor_intensity_keyword,
-                    OOK0_spectra_keyword=args.OOK0_spectra_keyword,
-                    CCS_spectra_keyword=args.CCS_spectra_keyword,
+                    ook0_spectra_keyword=args.OOK0_spectra_keyword,
+                    ccs_spectra_keyword=args.CCS_spectra_keyword,
                     intensity_spectra_keyword=args.intensity_spectra_keyword,
                     )

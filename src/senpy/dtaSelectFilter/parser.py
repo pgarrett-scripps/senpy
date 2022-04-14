@@ -8,6 +8,11 @@ class FileState(Enum):
     INFO = 3
 
 
+# ugly but for continuity
+def read_file(dta_select_filter_file_path: str, version: str = None) -> ([str], [DTAFilterResult], [str]):
+    return parse_file(dta_select_filter_file_path, version)
+
+
 def parse_file(dta_select_filter_file_path: str, version: str = None) -> ([str], [DTAFilterResult], [str]):
     """
     Return list of FilteredProteinResult's

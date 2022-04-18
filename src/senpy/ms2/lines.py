@@ -339,6 +339,13 @@ class Ms2Spectra:
         val = self.get_i_line_value(keyword)  # none/str
         return [float(i) for i in ast.literal_eval(val)] if val else val
 
+    def get_mobility_mz_spectra(self, keyword=None) -> Union[List[float], None]:
+        if keyword is None:
+            keyword = ILine.MZ_SPECTRA_KEYWORD
+
+        val = self.get_i_line_value(keyword)  # none/str
+        return [float(i) for i in ast.literal_eval(val)] if val else val
+
     def serialize(self) -> str:
         lines = [self.s_line] + self.i_lines + [self.z_line] + self.peak_lines
         return ''.join([line.serialize() for line in lines])

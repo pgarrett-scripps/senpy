@@ -54,6 +54,7 @@ def parse_file(dta_select_filter_file_path: str, version: str = None) -> ([str],
                     if protein_line is not None:
                         dta_filter_results.append(DTAFilterResult(protein_line, peptide_lines))
                         peptide_lines = []
+                        protein_line = None
                     protein_line = ProteinLine.deserialize(line, version=version)
 
             if file_state == FileState.INFO:

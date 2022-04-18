@@ -1,8 +1,6 @@
 import argparse
-import ast
 import os.path
 
-import numpy as np
 from tqdm import tqdm
 
 from senpy.ms2.lines import ILine
@@ -39,6 +37,8 @@ def parse_args():
                          help='I line keyword for CCS spectra')
     _parser.add_argument('--intensity_spectra_keyword', required=False, type=str,
                          default=ILine.INTENSITY_SPECTRA_KEYWORD, help='I line keyword for intensity spectra')
+    _parser.add_argument('--mz_spectra_keyword', required=False, type=str,
+                         default=ILine.MZ_SPECTRA_KEYWORD, help='I line keyword for mz spectra')
 
     # add the command line args from the stream-engine
     return _parser.parse_args()
@@ -55,11 +55,13 @@ def generate_output(ms2_path=None,
                     ook0_spectra_keyword=None,
                     ccs_spectra_keyword=None,
                     intensity_spectra_keyword=None,
+                    mz_spectra_keyword=None
                     ):
-    ms2_file_name = os.path.splitext(os.path.basename(ms2_path))[0]
+    ms2_file_name = os.path.basename(ms2_path).split(".ms2")[0]
+    print("ms2_file_name: " + ms2_file_name)
 
     peptide_line_by_scan_number_map = {}
-    dta_filter_results = parse_filter(filter_path)
+    _, dta_filter_results, _ = parse_filter(filter_path)
 
     print("DTASelect-filter")
     for filter_result in dta_filter_results:
@@ -70,7 +72,7 @@ def generate_output(ms2_path=None,
 
     print("MS2")
     out_lines = []
-    ms2_spectras = read_file(ms2_path)
+    _, ms2_spectras = read_file(ms2_path)
     for ms2_spectra in tqdm(ms2_spectras):
         ms2_scan_number = int(ms2_spectra.s_line.get_low_scan())
         if ms2_scan_number in peptide_line_by_scan_number_map:
@@ -90,7 +92,9 @@ def generate_output(ms2_path=None,
                                    keyword=precursor_intensity_keyword),
                                OOK0_spectra=ms2_spectra.get_ook0_spectra(keyword=ook0_spectra_keyword),
                                CCS_spectra=ms2_spectra.get_ccs_spectra(keyword=ccs_spectra_keyword),
-                               intensity_spectra=ms2_spectra.get_intensity_spectra(keyword=intensity_spectra_keyword))
+                               intensity_spectra=ms2_spectra.get_mobility_intensity_spectra(
+                                   keyword=intensity_spectra_keyword),
+                               mz_spectra=ms2_spectra.get_mobility_mz_spectra(keyword=mz_spectra_keyword))
 
             out_lines.append(out_line)
 
@@ -115,4 +119,5 @@ if __name__ == '__main__':
                     ook0_spectra_keyword=args.OOK0_spectra_keyword,
                     ccs_spectra_keyword=args.CCS_spectra_keyword,
                     intensity_spectra_keyword=args.intensity_spectra_keyword,
+                    mz_spectra_keyword=args.mz_spectra_keyword
                     )

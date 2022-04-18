@@ -5,15 +5,12 @@ from typing import List, Dict, Union
 import numpy as np
 
 from senpy.ms2 import exceptions as ms2_exceptions
-
-
-class _PeakLineColumns(Enum):
-    mz = 0
-    intensity = 1
+from senpy.ms2.columns import PeakLineColumns, ZLineColumns, ILineColumns, SLineColumns
+from senpy.ms2.lines import ILine as ms2_ILine
 
 
 @dataclass
-class PeakLine():
+class PeakLine:
     """
     Class for keeping track of peak lines
 
@@ -26,15 +23,15 @@ class PeakLine():
 
     def get_mz(self):
         line_elements = self.line.rstrip().split(" ")
-        return line_elements[_PeakLineColumns.mz.value]
+        return line_elements[PeakLineColumns.mz.value]
 
     def get_intensity(self):
         line_elements = self.line.rstrip().split(" ")
-        return line_elements[_PeakLineColumns.intensity.value]
+        return line_elements[PeakLineColumns.intensity.value]
 
 
 @dataclass
-class HLine():
+class HLine:
     """
     Class for storing H line Information
 
@@ -47,12 +44,6 @@ class HLine():
     def get_info(self):
         line_elements = self.line.rstrip().split("\t")
         return "\t".join(line_elements[1:])
-
-
-class _ZLineColumns(Enum):
-    letter = 0
-    charge = 1
-    mass = 2
 
 
 @dataclass
@@ -68,21 +59,16 @@ class ZLine:
 
     def get_charge(self):
         line_elements = self.line.rstrip().split("\t")
-        return line_elements[_ZLineColumns.charge.value]
+        return line_elements[ZLineColumns.charge.value]
 
     def get_mass(self):
         line_elements = self.line.rstrip().split("\t")
-        return line_elements[_ZLineColumns.mass.value]
+        return line_elements[ZLineColumns.mass.value]
 
-
-class _ILineColumns(Enum):
-    letter = 0
-    keyword = 1
-    value = 2
 
 
 @dataclass
-class ILine():
+class ILine:
     """
     Class keeping track of ms2 I lines.
 
@@ -96,22 +82,15 @@ class ILine():
 
     def get_keyword(self):
         line_elements = self.line.rstrip().split("\t")
-        return line_elements[_ILineColumns.keyword.value]
+        return line_elements[ILineColumns.keyword.value]
 
     def get_value(self):
         line_elements = self.line.rstrip().split("\t")
-        return line_elements[_ILineColumns.value.value]
-
-
-class _SLineColumns(Enum):
-    letter = 0
-    low_scan = 1
-    high_scan = 2
-    mz = 3
+        return line_elements[ILineColumns.val.value]
 
 
 @dataclass
-class SLine():
+class SLine:
     """
     Class keeping track of ms2 S lines.
 
@@ -124,15 +103,15 @@ class SLine():
 
     def get_low_scan(self):
         line_elements = self.line.rstrip().split("\t")
-        return line_elements[_SLineColumns.low_scan.value]
+        return line_elements[SLineColumns.low_scan.value]
 
     def get_high_scan(self):
         line_elements = self.line.rstrip().split("\t")
-        return line_elements[_SLineColumns.high_scan.value]
+        return line_elements[SLineColumns.high_scan.value]
 
     def get_mz(self):
         line_elements = self.line.rstrip().split("\t")
-        return line_elements[_SLineColumns.mz.value]
+        return line_elements[SLineColumns.mz.value]
 
 
 @dataclass
@@ -170,56 +149,63 @@ class Ms2Spectra:
 
     def get_retention_time(self, keyword=None) -> Union[str, None]:
         if keyword is None:
-            keyword = ILine.RETENTION_TIME_KEYWORD
+            keyword = ms2_ILine.RETENTION_TIME_KEYWORD
 
         val = self.get_i_line_value(keyword)  # none/str
         return val
 
     def get_collision_energy(self, keyword=None) -> Union[str, None]:
         if keyword is None:
-            keyword = ILine.COLLISION_ENERGY_KEYWORD
+            keyword = ms2_ILine.COLLISION_ENERGY_KEYWORD
 
         val = self.get_i_line_value(keyword)  # none/str
         return val
 
-    def get_OOK0(self, keyword=None) -> Union[str, None]:
+    def get_ook0(self, keyword=None) -> Union[str, None]:
         if keyword is None:
-            keyword = ILine.OOK0_KEYWORD
+            keyword = ms2_ILine.OOK0_KEYWORD
 
         val = self.get_i_line_value(keyword)  # none/str
         return val
 
-    def get_CCS(self, keyword=None) -> Union[str, None]:
+    def get_ccs(self, keyword=None) -> Union[str, None]:
         if keyword is None:
-            keyword = ILine.CCS_KEYWORD
+            keyword = ms2_ILine.CCS_KEYWORD
 
         val = self.get_i_line_value(keyword)  # none/str
         return val
 
     def get_precursor_intensity(self, keyword=None) -> Union[str, None]:
         if keyword is None:
-            keyword = ILine.PRECURSOR_INTENSITY_KEYWORD
+            keyword = ms2_ILine.PRECURSOR_INTENSITY_KEYWORD
 
         val = self.get_i_line_value(keyword)  # none/str
         return val
 
-    def get_OOK0_spectra(self, keyword=None) -> Union[str, None]:
+    def get_ook0_spectra(self, keyword=None) -> Union[str, None]:
         if keyword is None:
-            keyword = ILine.OOK0_SPECTRA_KEYWORD
+            keyword = ms2_ILine.OOK0_SPECTRA_KEYWORD
 
         val = self.get_i_line_value(keyword)  # none/str
         return val
 
-    def get_CCS_spectra(self, keyword=None) -> Union[str, None]:
+    def get_ccs_spectra(self, keyword=None) -> Union[str, None]:
         if keyword is None:
-            keyword = ILine.CCS_SPECTRA_KEYWORD
+            keyword = ms2_ILine.CCS_SPECTRA_KEYWORD
 
         val = self.get_i_line_value(keyword)  # none/str
         return val
 
-    def get_intensity_spectra(self, keyword=None) -> Union[str, None]:
+    def get_mobility_intensity_spectra(self, keyword=None) -> Union[str, None]:
         if keyword is None:
-            keyword = ILine.INTENSITY_SPECTRA_KEYWORD
+            keyword = ms2_ILine.INTENSITY_SPECTRA_KEYWORD
+
+        val = self.get_i_line_value(keyword)  # none/str
+        return val
+
+    def get_mobility_mz_spectra(self, keyword=None) -> Union[List[float], None]:
+        if keyword is None:
+            keyword = ms2_ILine.MZ_SPECTRA_KEYWORD
 
         val = self.get_i_line_value(keyword)  # none/str
         return val

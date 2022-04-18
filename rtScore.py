@@ -23,7 +23,7 @@ def parse_args():
                          help='path to sqt file')
     _parser.add_argument('--ms2', required=True, type=str, default=None,
                          help='path to ms2 file')
-    _parser.add_argument('--out', required=True, type=str, default=None,
+    _parser.add_argument('--out', required=False, type=str, default=None,
                          help='path to out sqt file')
     _parser.add_argument('--retention_time_keyword', required=False, type=str, default=ILine.RETENTION_TIME_KEYWORD,
                          help='I line keyword for retention time')
@@ -123,12 +123,13 @@ def generate_rt_score_sqt(sqt_file, ms2_file, out_file, retention_time_keyword):
             m_line.predicted_ook0 = predicted_rt
             m_line.tims_score = timsscore
 
-    sqt_parser.write_file(_, s_lines, out_file, version="v2.1.0")
+    sqt_parser.write_file(_, s_lines, out_file, version="v2.1.0_ext")
 
 if __name__ == '__main__':
     args = parse_args()
 
+    if args.out is None:
+        args.out = args.sqt + ".rtscore"
     print(args)
-
     generate_rt_score_sqt(args.sqt, args.ms2, args.out, retention_time_keyword=args.retention_time_keyword)
 

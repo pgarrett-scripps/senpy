@@ -5,7 +5,7 @@ with open("README", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="senpy",
-    version="0.0.1",
+    version="0.0.2",
     author="Patrick Garrett",
     author_email="pgarrett@scripps.edu",
     description="A small package for handling ip2 related files",

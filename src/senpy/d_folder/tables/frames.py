@@ -3,7 +3,7 @@ from enum import Enum
 from sqlite3 import Connection
 from typing import Union, List, Any
 
-from senpy.tdf_tables.table_util import get_table_rows, cast_int, cast_float, cast_str, TableNames
+from senpy.d_folder.tables.table_util import get_table_rows, cast_int, cast_float, cast_str, TableNames
 
 
 class _FramesTableDeserializationException(Exception):

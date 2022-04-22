@@ -1,7 +1,6 @@
 from Bio import SeqIO
 
-
-def parse_file(fasta_file_path):
+def read_file(fasta_file_path):
     records = []
     for record in SeqIO.parse(fasta_file_path, "fasta"):
         # record options: 'annotations', 'dbxrefs', 'description', 'features', 'format', 'id', 'letter_annotations', 'lower', 'name', 'reverse_complement', 'seq', 'translate', 'upper']

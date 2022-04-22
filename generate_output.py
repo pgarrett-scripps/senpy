@@ -5,7 +5,7 @@ from tqdm import tqdm
 
 from senpy.ms2.lines import ILine
 from senpy.ms2_fast.parser import read_file
-from senpy.dtaSelectFilter.parser import parse_file as parse_filter
+from senpy.dtaSelectFilter.parser import read_file as parse_filter
 from senpy.out.line import OutLine
 from senpy.out.parser import write_file
 

@@ -1,6 +1,6 @@
-from senpy.dtaSelectFilter.parser import parse_file
+from senpy.dtaSelectFilter.parser import read_file
 
 
-fpr = parse_file("C:\data\GoldenData\DTASelect-filter.txt")
+fpr = read_file("C:\data\GoldenData\DTASelect-filter.txt")
 print(fpr[0])
 

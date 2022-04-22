@@ -1,3 +1,0 @@
-from senpy.tdf_tables.frames import get_frame_table_items
-from senpy.tdf_tables.pasef_frame_msms_info import get_pasef_frame_msms_table_items
-from senpy.tdf_tables.precursors import get_precursors_table_items

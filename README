@@ -5,6 +5,8 @@
 
 Serializer/Encoder for various proteomics files
 
+Update timsdata.py with new version from pe-py-timscore (Dia) package
+
 ms2 vs ms2_fast
     ms2_fast parses ~10x faster
     doesnt store spectra

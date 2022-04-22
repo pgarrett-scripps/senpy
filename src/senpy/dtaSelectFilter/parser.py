@@ -8,12 +8,7 @@ class FileState(Enum):
     INFO = 3
 
 
-# ugly but for continuity
 def read_file(dta_select_filter_file_path: str, version: str = None) -> ([str], [DTAFilterResult], [str]):
-    return parse_file(dta_select_filter_file_path, version)
-
-
-def parse_file(dta_select_filter_file_path: str, version: str = None) -> ([str], [DTAFilterResult], [str]):
     """
     Return list of FilteredProteinResult's
     """
@@ -86,9 +81,9 @@ def write_file(h_lines: [str], dta_filter_results: [DTAFilterResult], end_lines:
 
 if __name__ == "__main__":
 
-    h_lines, locus_lines, end_lines = parse_file("C:\\Users\\Ty\\repos\\senpy_package\\sample_files\\DTASelect-filter.txt")
+    h_lines, locus_lines, end_lines = read_file("C:\\Users\\Ty\\repos\\senpy_package\\sample_files\\DTASelect-filter.txt")
     print("write")
     write_file(h_lines, locus_lines, end_lines, "tmp_out.dta")
 
-    h_lines, locus_lines, end_lines = parse_file("C:\\Users\\Ty\\repos\\senpy_package\\sample_files\\paser_dta_select.txt", version="v2.1.12_paser")
+    h_lines, locus_lines, end_lines = read_file("C:\\Users\\Ty\\repos\\senpy_package\\sample_files\\paser_dta_select.txt", version="v2.1.12_paser")
     write_file(h_lines, locus_lines, end_lines, "tmp_out.dta", version="v2.1.12_paser")

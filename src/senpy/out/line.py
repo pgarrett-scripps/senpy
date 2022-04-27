@@ -137,6 +137,9 @@ class OutLine(Line):
         line_elements[_OutLineColumns.intensity_spectra.value] = \
             str([f"{val:.{self.INTENSITY_PRECISION}f}" for val in self.intensity_spectra]).replace("'", "") if type(
                 self.intensity_spectra) != str else self.intensity_spectra
+        line_elements[_OutLineColumns.mz_spectra.value] = \
+            str([f"{val:.{self.MZ_PRECISION}f}" for val in self.mz_spectra]).replace("'", "") if type(
+                self.mz_spectra) != str else self.mz_spectra
         line_elements = [str(elem) for elem in line_elements]
 
         return '\t'.join(line_elements) + '\n'

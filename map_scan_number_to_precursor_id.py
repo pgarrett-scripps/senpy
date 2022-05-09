@@ -33,7 +33,7 @@ def main(ms2_path, out_path):
 if __name__ == '__main__':
     args = parse_args()
     if args.out is None:
-        args.out = os.path.splitext(args.ms2)[0] + ".sn2p"
+        args.out = args.ms2 + ".sn2p"
 
     print(args)
 

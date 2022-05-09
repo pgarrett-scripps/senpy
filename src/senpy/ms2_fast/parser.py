@@ -2,7 +2,7 @@ from typing import List
 
 from tqdm import tqdm
 
-from senpy.ms2_fast.lines import SLine, HLine, ZLine, PeakLine, ILine, Ms2Spectra, parse_ms2_line
+from .lines import SLine, HLine, ZLine, PeakLine, ILine, Ms2Spectra, parse_ms2_line
 
 
 def read_file(file_path) -> (List[HLine], List[Ms2Spectra]):

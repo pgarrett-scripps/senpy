@@ -3,9 +3,9 @@ from dataclasses import dataclass
 from typing import List, Dict, Union, ClassVar
 import numpy as np
 
-from senpy.ms2 import exceptions as ms2_exceptions
-from senpy.ms2.columns import PeakLineColumns, ZLineColumns, ILineColumns, SLineColumns
-from senpy.util import Line, HLine
+from . import exceptions as ms2_exceptions
+from .columns import PeakLineColumns, ZLineColumns, ILineColumns, SLineColumns
+from ..util import Line, HLine
 
 
 @dataclass
@@ -282,6 +282,20 @@ class Ms2Spectra:
         if keyword in i_line_dict:
             return i_line_dict[keyword]
         return None
+
+    def get_parent_id(self, keyword=None) -> Union[str, None]:
+        if keyword is None:
+            keyword = ILine.PARENT_ID_KEYWORD
+
+        val = self.get_i_line_value(keyword)  # none/str
+        return val
+
+    def get_precursor_id(self, keyword=None) -> Union[str, None]:
+        if keyword is None:
+            keyword = ILine.PRECURSOR_ID_KEYWORD
+
+        val = self.get_i_line_value(keyword)  # none/str
+        return val
 
     def get_retention_time(self, keyword=None) -> Union[float, None]:
         if keyword is None:

@@ -4,9 +4,9 @@ from enum import Enum
 from typing import List, Dict, Union
 import numpy as np
 
-from senpy.ms2 import exceptions as ms2_exceptions
-from senpy.ms2.columns import PeakLineColumns, ZLineColumns, ILineColumns, SLineColumns
-from senpy.ms2.lines import ILine as ms2_ILine
+from ..ms2 import exceptions as ms2_exceptions
+from ..ms2.columns import PeakLineColumns, ZLineColumns, ILineColumns, SLineColumns
+from ..ms2.lines import ILine as ms2_ILine
 
 
 @dataclass
@@ -146,6 +146,20 @@ class Ms2Spectra:
         if keyword in self.i_line_dict:
             return self.i_line_dict[keyword]
         return None
+
+    def get_parent_id(self, keyword=None) -> Union[str, None]:
+        if keyword is None:
+            keyword = ms2_ILine.PARENT_ID_KEYWORD
+
+        val = self.get_i_line_value(keyword)  # none/str
+        return val
+
+    def get_precursor_id(self, keyword=None) -> Union[str, None]:
+        if keyword is None:
+            keyword = ms2_ILine.PRECURSOR_ID_KEYWORD
+
+        val = self.get_i_line_value(keyword)  # none/str
+        return val
 
     def get_retention_time(self, keyword=None) -> Union[str, None]:
         if keyword is None:

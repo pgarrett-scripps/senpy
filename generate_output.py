@@ -1,13 +1,11 @@
 import argparse
 import os.path
 
-from tqdm import tqdm
-
-from senpy.ms2.lines import ILine
-from senpy.ms2_fast.parser import read_file
-from senpy.dtaSelectFilter.parser import read_file as parse_filter
-from senpy.out.line import OutLine
-from senpy.out.parser import write_file
+from src.senpy.ms2.lines import ILine
+from src.senpy.ms2_fast.parser import read_file
+from src.senpy.dtaSelectFilter.parser import read_file as parse_filter
+from src.senpy.out.line import OutLine
+from src.senpy.out.parser import write_file
 
 
 def parse_args():
@@ -40,7 +38,6 @@ def parse_args():
     _parser.add_argument('--mz_spectra_keyword', required=False, type=str,
                          default=ILine.MZ_SPECTRA_KEYWORD, help='I line keyword for mz spectra')
 
-    # add the command line args from the stream-engine
     return _parser.parse_args()
 
 
@@ -73,7 +70,7 @@ def generate_output(ms2_path=None,
     print("MS2")
     out_lines = []
     _, ms2_spectras = read_file(ms2_path)
-    for ms2_spectra in tqdm(ms2_spectras):
+    for ms2_spectra in ms2_spectras:
         ms2_scan_number = int(ms2_spectra.s_line.get_low_scan())
         if ms2_scan_number in peptide_line_by_scan_number_map:
             peptide_line = peptide_line_by_scan_number_map[ms2_scan_number]

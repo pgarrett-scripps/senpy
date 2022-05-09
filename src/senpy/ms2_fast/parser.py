@@ -1,7 +1,5 @@
 from typing import List
 
-from tqdm import tqdm
-
 from .lines import SLine, HLine, ZLine, PeakLine, ILine, Ms2Spectra, parse_ms2_line
 
 
@@ -16,7 +14,7 @@ def read_file(file_path) -> (List[HLine], List[Ms2Spectra]):
 
     with open(file_path) as file:
         s_line, z_line, i_lines, peak_lines = None, None, [], []
-        for line in tqdm(file):
+        for line in file:
             if line == "" or line == "\n":
                 continue
             ms2_line = parse_ms2_line(line)

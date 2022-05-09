@@ -2,7 +2,8 @@ import ast
 from dataclasses import dataclass
 from enum import Enum
 from typing import List, ClassVar, Union
-from senpy.util import Line
+
+from ..util import Line
 
 
 class _OutLineColumns(Enum):

@@ -17,6 +17,8 @@ def parse_args():
                          help='path to DTASelect-filter file')
     _parser.add_argument('--out', required=False, type=str, default=None,
                          help='path to DTASelect-filter file')
+    _parser.add_argument('--sn2p', required=False, type=str, default=None,
+                         help='path to sn2p file (sn to prec id)')
 
     # Allow for custom ms2 I line keywords
     _parser.add_argument('--retention_time_keyword', required=False, type=str, default=ILine.RETENTION_TIME_KEYWORD,
@@ -44,6 +46,7 @@ def parse_args():
 def generate_output(ms2_path=None,
                     filter_path=None,
                     out_path=None,
+                    sn2p_path=None,
                     retention_time_keyword=None,
                     ook0_keyword=None,
                     ccs_keyword=None,
@@ -56,6 +59,15 @@ def generate_output(ms2_path=None,
                     ):
     ms2_file_name = os.path.basename(ms2_path).split(".ms2")[0]
     print("ms2_file_name: " + ms2_file_name)
+
+    precursor_id_to_scan_number_map = {}
+    if sn2p_path:
+        print("snap")
+        with open(sn2p_path) as file:
+            for line in file:
+                line_elems = line.rstrip().split('\t')
+                precursor_id_to_scan_number_map[int(line_elems[1])] = int(line_elems[0])
+
 
     peptide_line_by_scan_number_map = {}
     _, dta_filter_results, _ = parse_filter(filter_path)
@@ -72,6 +84,12 @@ def generate_output(ms2_path=None,
     _, ms2_spectras = read_file(ms2_path)
     for ms2_spectra in ms2_spectras:
         ms2_scan_number = int(ms2_spectra.s_line.get_low_scan())
+
+        if sn2p_path:
+            if int(ms2_spectra.get_precursor_id()) not in precursor_id_to_scan_number_map:
+                continue
+            ms2_scan_number = precursor_id_to_scan_number_map[int(ms2_spectra.get_precursor_id())]
+
         if ms2_scan_number in peptide_line_by_scan_number_map:
             peptide_line = peptide_line_by_scan_number_map[ms2_scan_number]
 
@@ -103,11 +121,10 @@ if __name__ == '__main__':
     if args.out is None:
         args.out = os.path.splitext(args.ms2)[0] + ".out"
 
-    print(args)
-
-    generate_output(args.ms2,
-                    args.filter,
-                    args.out,
+    generate_output(ms2_path=args.ms2,
+                    filter_path=args.filter,
+                    out_path=args.out,
+                    sn2p_path=args.sn2p,
                     retention_time_keyword=args.retention_time_keyword,
                     ook0_keyword=args.OOK0_keyword,
                     ccs_keyword=args.CCS_keyword,

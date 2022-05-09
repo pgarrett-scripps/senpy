@@ -1,4 +1,4 @@
-from senpy.dtaSelectFilter.lines import ProteinLine, DTAFilterResult, PeptideLine
+from .lines import ProteinLine, DTAFilterResult, PeptideLine
 from enum import Enum
 
 

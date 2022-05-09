@@ -1,6 +1,6 @@
 from typing import List
 
-from senpy.out.line import OutLine
+from .line import OutLine
 
 
 def read_file(file_path: str) -> List[OutLine]:

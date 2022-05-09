@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from typing import List, ClassVar, Union
 
-from senpy.util import Line, serialize_float
-from senpy.dtaSelectFilter.exceptions import *
-from senpy.dtaSelectFilter.columns import *
+from ..util import Line, serialize_float
+from .exceptions import *
+from .columns import *
 
 
 @dataclass

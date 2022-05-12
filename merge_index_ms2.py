@@ -6,6 +6,10 @@ from src.senpy.ms2.fast_parser import read_file as read_file_fast
 from src.senpy.ms2.fast_parser import write_file as write_file_fast
 from src.senpy.ms2.parser import read_file
 
+FILE_OOK0_KEY = "OOK0"
+FILE_RETENTION_TIME_KEY = "Retention_Time"
+TIMSCORE_OOK0_KEY = "Ion Mobility"
+TIMSCORE_RETENTION_TIME_KEY = "RetTime"
 
 def parse_args():
     # Parse Arguments
@@ -31,6 +35,14 @@ def main(ms2_path, index_path):
 
     os.rename(ms2_path, ms2_path + ".bak")
     time.sleep(5)
+
+    # convert to timscore
+    for spectra in ms2_index_spectras:
+        for i_line in spectra.i_lines:
+            if "Spectra" not in i_line.line:
+                i_line.line = i_line.line.replace(FILE_OOK0_KEY, TIMSCORE_OOK0_KEY)
+                i_line.line = i_line.line.replace(FILE_RETENTION_TIME_KEY, TIMSCORE_RETENTION_TIME_KEY)
+
     write_file_fast(_, ms2_index_spectras, ms2_path)
 
 

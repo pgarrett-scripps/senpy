@@ -4,12 +4,11 @@ from functools import lru_cache
 from typing import Callable
 
 import numpy as np
-from tqdm import tqdm
 
-from senpy.ms2_refactor.exceptions import Ms2FileDeserializationZLineException
-from senpy.ms2_refactor.columns import ZLineColumns
-from senpy.ms2_refactor.lines import ZLine
-from senpy.ms2_refactor.sers.line import LineSerializer
+from ..exceptions import Ms2FileDeserializationZLineException
+from ..columns import ZLineColumns
+from ..lines import ZLine
+from .line import LineSerializer
 
 
 class ZLineSerializer(LineSerializer):
@@ -78,7 +77,7 @@ if __name__ == '__main__':
     print(line)
     print(ser.serialize(line))
 
-    for i in tqdm(range(1_000_000)):
+    for i in range(1_000_000):
         line = ser.deserialize(sample_s_line)
 
     print("done")

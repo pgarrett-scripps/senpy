@@ -1,9 +1,10 @@
 from typing import List
 
-from .lines import SLine, HLine, ZLine, PeakLine, ILine, Ms2Spectra, parse_ms2_line
+from reader_stats import ReaderStats
+from .fast_lines import SLine, HLine, ZLine, PeakLine, ILine, Ms2SpectraFast, parse_ms2_line
 
 
-def read_file(file_path) -> (List[HLine], List[Ms2Spectra]):
+def read_file(file_path) -> (List[HLine], List[Ms2SpectraFast]):
     """
     Return HLines and Ms2Spectra, from provided ms2 file. Will always
     return correctly and fully read ms2 file until eof or corrupted line is reached.
@@ -11,7 +12,6 @@ def read_file(file_path) -> (List[HLine], List[Ms2Spectra]):
     :return:    (List[HLine], List[Ms2Spectra]):          lists of HLines and Ms2Spectra
     """
     h_lines, ms2_spectras = [], []
-
     with open(file_path) as file:
         s_line, z_line, i_lines, peak_lines = None, None, [], []
         for line in file:
@@ -23,7 +23,7 @@ def read_file(file_path) -> (List[HLine], List[Ms2Spectra]):
                 continue
             elif isinstance(ms2_line, SLine):
                 if s_line is not None:
-                    ms2_spectras.append(Ms2Spectra(s_line=s_line,
+                    ms2_spectras.append(Ms2SpectraFast(s_line=s_line,
                                                    z_line=z_line,
                                                    i_lines=i_lines,
                                                    peak_lines=peak_lines
@@ -39,17 +39,17 @@ def read_file(file_path) -> (List[HLine], List[Ms2Spectra]):
                 #peak_lines.append(ms2_line)
                 pass
 
-        ms2_spectras.append(Ms2Spectra(s_line=s_line,
+        ms2_spectras.append(Ms2SpectraFast(s_line=s_line,
                                        z_line=z_line,
                                        i_lines=i_lines,
                                        peak_lines=peak_lines
                                        )
                             )
 
-        return h_lines, ms2_spectras
+    return h_lines, ms2_spectras
 
 
-def read_file_incrementally(file_path) -> List[Ms2Spectra]:
+def read_file_incrementally(file_path) -> List[Ms2SpectraFast]:
     """
     Return Ms2Spectra incrementally, from provided ms2 file. Will always
     return correctly and fully read ms2 file until eof or corrupted line is reached.
@@ -65,7 +65,7 @@ def read_file_incrementally(file_path) -> List[Ms2Spectra]:
                 continue
             elif isinstance(ms2_line, SLine):
                 if s_line is not None:
-                    yield Ms2Spectra(s_line=s_line,
+                    yield Ms2SpectraFast(s_line=s_line,
                                      z_line=z_line,
                                      i_lines=i_lines,
                                      peak_lines=peak_lines
@@ -81,16 +81,16 @@ def read_file_incrementally(file_path) -> List[Ms2Spectra]:
                 #peak_lines.append(ms2_line)
                 pass
 
-        yield Ms2Spectra(s_line=s_line,
+        yield Ms2SpectraFast(s_line=s_line,
                           z_line=z_line,
                           i_lines=i_lines,
                           peak_lines=peak_lines
                           )
 
-        return
+    return
 
 
-def write_file(h_lines: List[HLine], ms2_spectras: List[Ms2Spectra], out_file_path: str) -> None:
+def write_file(h_lines: List[HLine], ms2_spectras: List[Ms2SpectraFast], out_file_path: str) -> None:
     """
     Write Ms2 file from HLines and Ms2Spectra
     :param:     h_lines:    [HLine],      list of header lines

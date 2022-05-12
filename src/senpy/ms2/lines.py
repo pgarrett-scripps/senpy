@@ -275,7 +275,7 @@ class Ms2Spectra:
     def get_i_line_dict(self):
         if self.i_line_dict:
             return self.i_line_dict
-        return {i_line.keyword: i_line.value for i_line in self.i_lines}
+        return {i_line.keyword: i_line.val for i_line in self.i_lines}
 
     def get_i_line_value(self, keyword) -> Union[str, None]:
         i_line_dict = self.get_i_line_dict()

@@ -1,8 +1,7 @@
 from typing import List
 
-from tqdm import tqdm
-
-from senpy.ms2.lines import SLine, HLine, ZLine, PeakLine, ILine, Ms2Spectra, parse_ms2_line
+from reader_stats import ReaderStats
+from .lines import SLine, HLine, ZLine, PeakLine, ILine, Ms2Spectra, parse_ms2_line
 
 
 def read_file(file_path) -> (List[HLine], List[Ms2Spectra]):
@@ -16,7 +15,7 @@ def read_file(file_path) -> (List[HLine], List[Ms2Spectra]):
 
     with open(file_path) as file:
         s_line, z_line, i_lines, peak_lines = None, None, [], []
-        for line in tqdm(file):
+        for i, line in enumerate(file):
             if line == "" or line == "\n":
                 continue
             ms2_line = parse_ms2_line(line)
@@ -47,7 +46,7 @@ def read_file(file_path) -> (List[HLine], List[Ms2Spectra]):
                                        )
                             )
 
-        return h_lines, ms2_spectras
+    return h_lines, ms2_spectras
 
 
 def read_file_incrementally(file_path) -> List[Ms2Spectra]:
@@ -81,7 +80,7 @@ def read_file_incrementally(file_path) -> List[Ms2Spectra]:
             elif isinstance(ms2_line, PeakLine):
                 peak_lines.append(ms2_line)
 
-        return Ms2Spectra(s_line=s_line,
+    return Ms2Spectra(s_line=s_line,
                           z_line=z_line,
                           i_lines=i_lines,
                           peak_lines=peak_lines

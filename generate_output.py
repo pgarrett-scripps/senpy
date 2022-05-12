@@ -2,7 +2,7 @@ import argparse
 import os.path
 
 from src.senpy.ms2.lines import ILine
-from src.senpy.ms2_fast.parser import read_file
+from src.senpy.ms2.fast_parser import read_file
 from src.senpy.dtaSelectFilter.parser import read_file as parse_filter
 from src.senpy.out.line import OutLine
 from src.senpy.out.parser import write_file
@@ -55,7 +55,8 @@ def generate_output(ms2_path=None,
                     ook0_spectra_keyword=None,
                     ccs_spectra_keyword=None,
                     intensity_spectra_keyword=None,
-                    mz_spectra_keyword=None
+                    mz_spectra_keyword=None,
+                    dta_filter_version=None
                     ):
     ms2_file_name = os.path.basename(ms2_path).split(".ms2")[0]
     print("ms2_file_name: " + ms2_file_name)
@@ -70,7 +71,7 @@ def generate_output(ms2_path=None,
 
 
     peptide_line_by_scan_number_map = {}
-    _, dta_filter_results, _ = parse_filter(filter_path)
+    _, dta_filter_results, _ = parse_filter(filter_path, version=dta_filter_version)
 
     print("DTASelect-filter")
     for filter_result in dta_filter_results:

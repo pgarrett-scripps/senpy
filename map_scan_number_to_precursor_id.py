@@ -1,7 +1,7 @@
 import argparse
 import os
 
-from src.senpy.ms2_fast.parser import read_file
+from ms2.fast_parser import read_file
 
 
 def parse_args():

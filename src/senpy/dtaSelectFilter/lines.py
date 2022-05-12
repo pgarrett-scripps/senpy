@@ -48,8 +48,12 @@ class PeptideLine(Line):
     predicted_im_value: Union[float, None]
     im_score: Union[float, None]
     ret_time: Union[float, None]
-    ptm_index: Union[int, None]
-    ptm_index_protein_list: Union[int, None]
+    ptm_index: Union[str, None]
+    ptm_index_protein_list: Union[str, None]
+
+    experimental_mz: Union[float, None]
+    corrected_1k0: Union[float, None]
+    ion_mobility: Union[float, None]
 
     X_CORR_PRECISION: ClassVar[int] = 4
     DELTA_CN_PRECISION: ClassVar[int] = 4
@@ -65,6 +69,9 @@ class PeptideLine(Line):
     PREDICTED_IM_VALUE_PRECISION: ClassVar[int] = 16
     IM_SCORE_PRECISION: ClassVar[int] = 4
     RET_TIME_PRECISION: ClassVar[int] = 4
+    EXPERIMENTAL_MZ_PRECISION: ClassVar[int] = 4
+    CORRECTED_OOK0_PRECISION: ClassVar[int] = 4
+    ION_MOBILITY_PRECISION: ClassVar[int] = 4
 
     @staticmethod
     def deserialize(line: str, version="v2.1.13") -> 'PeptideLine':
@@ -100,6 +107,9 @@ class PeptideLine(Line):
             ret_time = None
             ptm_index = None
             ptm_index_protein_list = None
+            experimental_mz = None
+            corrected_1k0 = None
+            ion_mobility = None
 
         elif version == "v2.1.13":
             columns = PeptideLineColumns_v2_1_13
@@ -133,6 +143,9 @@ class PeptideLine(Line):
             ret_time = None
             ptm_index = None
             ptm_index_protein_list = None
+            experimental_mz = None
+            corrected_1k0 = None
+            ion_mobility = None
 
         elif version == "v2.1.12_paser":
             columns = PeptideLineColumns_v2_1_12_paser
@@ -165,6 +178,40 @@ class PeptideLine(Line):
             measured_im_value = None
             predicted_im_value = None
             im_score = None
+            experimental_mz = None
+            corrected_1k0 = None
+            ion_mobility = None
+        elif version == "v2.1.13_timscore":
+            columns = PeptideLineColumns_v2_1_13_timscore
+
+            if len(line_elements) != len(columns):
+                raise DTASelectFilterDeserializationPeptideLineException(line)
+
+            is_unique = PeptideLine._deserialize_is_unique(line_elements[columns.is_unique.value])
+            file_name, low_scan, high_scan, charge = PeptideLine._deserialize_file_line(line_elements[columns.file_name.value])
+            x_corr = PeptideLine._deserialize_x_corr(line_elements[columns.x_corr.value])
+            delta_cn = PeptideLine._deserialize_delta_cn(line_elements[columns.delta_cn.value])
+            conf = PeptideLine._deserialize_conf(line_elements[columns.conf.value])
+            mass_plus_hydrogen = PeptideLine._deserialize_mass_plus_hydrogen(line_elements[columns.mass_plus_hydrogen.value])
+            calc_mass_plus_hydrogen = PeptideLine._deserialize_calc_mass_plus_hydrogen(line_elements[columns.calc_mass_plus_hydrogen.value])
+            ppm = PeptideLine._deserialize_ppm(line_elements[columns.ppm.value])
+            total_intensity = PeptideLine._deserialize_total_intensity(line_elements[columns.total_intensity.value])
+            spr = PeptideLine._deserialize_spr(line_elements[columns.spr.value])
+            prob_score = PeptideLine._deserialize_prob_score(line_elements[columns.prob_score.value])
+            pi = PeptideLine._deserialize_pi(line_elements[columns.pi.value])
+            ion_proportion = PeptideLine._deserialize_ion_proportion(line_elements[columns.ion_proportion.value])
+            redundancy = PeptideLine._deserialize_redundancy(line_elements[columns.redundancy.value])
+            measured_im_value = PeptideLine._deserialize_measured_im_value(line_elements[columns.measured_im_value.value])
+            predicted_im_value = PeptideLine._deserialize_predicted_im_value(line_elements[columns.predicted_im_value.value])
+            im_score = PeptideLine._deserialize_im_score(line_elements[columns.im_score.value])
+            sequence = PeptideLine._deserialize_sequence(line_elements[columns.sequence.value])
+            experimental_mz = PeptideLine._deserialize_experimental_mz(line_elements[columns.experimental_mz.value])
+            corrected_1k0 = PeptideLine._deserialize_corrected_1k0(line_elements[columns.corrected_1k0.value])
+            ion_mobility = PeptideLine._deserialize_ion_mobility(line_elements[columns.ion_mobility.value])
+            ret_time = PeptideLine._deserialize_ret_time(line_elements[columns.ret_time.value])
+            ptm_index = PeptideLine._deserialize_ptm_index(line_elements[columns.ptm_index.value])
+            ptm_index_protein_list = PeptideLine._deserialize_ptm_index_protein_list(line_elements[columns.ptm_index_protein_list.value])
+
         else:
             raise NotImplementedError
 
@@ -191,7 +238,10 @@ class PeptideLine(Line):
                            im_score=im_score,
                            ret_time=ret_time,
                            ptm_index=ptm_index,
-                           ptm_index_protein_list=ptm_index_protein_list
+                           ptm_index_protein_list=ptm_index_protein_list,
+                           experimental_mz=experimental_mz,
+                           corrected_1k0=corrected_1k0,
+                           ion_mobility=ion_mobility,
                            )
 
         return line
@@ -295,11 +345,23 @@ class PeptideLine(Line):
 
     @staticmethod
     def _deserialize_ptm_index(val):
-        return None if val == "NA" else int(val)
+        return None if val == "NA" else str(val)
 
     @staticmethod
     def _deserialize_ptm_index_protein_list(val):
-        return None if val == "NA" else int(val)
+        return None if val == "NA" else str(val)
+
+    @staticmethod
+    def _deserialize_experimental_mz(val):
+        return None if val == "NA" else float(val)
+
+    @staticmethod
+    def _deserialize_corrected_1k0(val):
+        return None if val == "NA" else float(val)
+
+    @staticmethod
+    def _deserialize_ion_mobility(val):
+        return None if val == "NA" else float(val)
 
     def serialize(self, version="v2.1.13") -> str:
         if version == "v2.1.12":
@@ -365,6 +427,33 @@ class PeptideLine(Line):
             line_elements[columns.ptm_index.value] = self._serialize_ptm_index()
             line_elements[columns.ptm_index_protein_list.value] = self._serialize_ptm_index_protein_list()
             return '\t'.join(line_elements) + '\n'
+        elif version == "v2.1.13_timscore":
+            columns = PeptideLineColumns_v2_1_13_timscore
+            line_elements = [""] * len(columns)
+            line_elements[columns.is_unique.value] = self._serialize_is_unique()
+            line_elements[columns.file_name.value] = self._serialize_file_line()
+            line_elements[columns.x_corr.value] = self._serialize_x_corr()
+            line_elements[columns.delta_cn.value] = self._serialize_delta_cn()
+            line_elements[columns.conf.value] = self._serialize_conf()
+            line_elements[columns.mass_plus_hydrogen.value] = self._serialize_mass_plus_hydrogen()
+            line_elements[columns.calc_mass_plus_hydrogen.value] = self._serialize_calc_mass_plus_hydrogen()
+            line_elements[columns.ppm.value] = self._serialize_ppm()
+            line_elements[columns.total_intensity.value] = self._serialize_total_intensity()
+            line_elements[columns.spr.value] = self._serialize_spr()
+            line_elements[columns.prob_score.value] = self._serialize_prob_score()
+            line_elements[columns.pi.value] = self._serialize_pi()
+            line_elements[columns.ion_proportion.value] = self._serialize_ion_proportion()
+            line_elements[columns.redundancy.value] = self._serialize_redundancy()
+            line_elements[columns.measured_im_value.value] = self._serialize_measured_im()
+            line_elements[columns.predicted_im_value.value] = self._serialize_predicted_im_value()
+            line_elements[columns.im_score.value] = self._serialize_im_score()
+            line_elements[columns.sequence.value] = self._serialize_sequence()
+            line_elements[columns.experimental_mz.value] = self._serialize_experimental_mz()
+            line_elements[columns.corrected_1k0.value] = self._serialize_corrected_1k0()
+            line_elements[columns.ion_mobility.value] = self._serialize_ion_mobility()
+            line_elements[columns.ret_time.value] = self._serialize_ret_time()
+            line_elements[columns.ptm_index.value] = self._serialize_ptm_index()
+            line_elements[columns.ptm_index_protein_list.value] = self._serialize_ptm_index_protein_list()
         else:
             raise NotImplementedError
 
@@ -450,6 +539,15 @@ class PeptideLine(Line):
     def _serialize_ptm_index_protein_list(self) -> str:
         return f"{self.ptm_index_protein_list}" if self.ptm_index_protein_list else "NA"
 
+    def _serialize_experimental_mz(self) -> str:
+        return str(round(self.experimental_mz, PeptideLine.EXPERIMENTAL_MZ_PRECISION))
+
+    def _serialize_corrected_1k0(self) -> str:
+        return str(round(self.corrected_1k0, PeptideLine.CORRECTED_OOK0_PRECISION))
+
+    def _serialize_ion_mobility(self) -> str:
+        return str(round(self.ion_mobility, PeptideLine.ION_MOBILITY_PRECISION))
+
 
 @dataclass
 class ProteinLine(Line):
@@ -490,7 +588,7 @@ class ProteinLine(Line):
 
         line_elements = line.rstrip().split("\t")
 
-        if version == "v2.1.12":
+        if version == "v2.1.12" or version == "v2.1.13":
             columns = ProteinLineColumns_v2_1_12
 
             if len(line_elements) != len(columns):
@@ -513,30 +611,7 @@ class ProteinLine(Line):
             l_redundancy = None
             m_redundancy = None
 
-        elif version == "v2.1.13":
-            columns = ProteinLineColumns_v2_1_13
-
-            if len(line_elements) != len(columns):
-                raise DTASelectFilterDeserializationProteinLineException(line)
-
-            locus_name = ProteinLine._deserialize_locus_name(line_elements[columns.locus_name.value])
-            sequence_count = ProteinLine._deserialize_sequence_count(line_elements[columns.sequence_count.value])
-            spectrum_count = ProteinLine._deserialize_spectrum_count(line_elements[columns.spectrum_count.value])
-            sequence_coverage = ProteinLine._deserialize_sequence_coverage(
-                line_elements[columns.sequence_coverage.value][:-1])  # remove % sign
-            length = ProteinLine._deserialize_length(line_elements[columns.length.value])
-            molWt = ProteinLine._deserialize_molWt(line_elements[columns.molWt.value])
-            pi = ProteinLine._deserialize_pi(line_elements[columns.pi.value])
-            validation_status = ProteinLine._deserialize_validation_status(
-                line_elements[columns.validation_status.value])
-            nsaf = ProteinLine._deserialize_nsaf(line_elements[columns.nsaf.value])
-            empai = ProteinLine._deserialize_empai(line_elements[columns.empai.value])
-            description_name = ProteinLine._deserialize_description_name(line_elements[columns.description_name.value])
-            h_redundancy = None
-            l_redundancy = None
-            m_redundancy = None
-
-        elif version == "v2.1.12_paser":
+        elif version == "v2.1.12_paser" or version == "v2.1.13_timscore":
             columns = ProteinLineColumns_v2_1_12_paser
 
             if len(line_elements) != len(columns):
@@ -636,7 +711,7 @@ class ProteinLine(Line):
         return int(val)
 
     def serialize(self, version="v2.1.13") -> str:
-        if version == "v2.1.12":
+        if version == "v2.1.12" or version == "v2.1.13":
             columns = ProteinLineColumns_v2_1_12
             line_elements = [""] * len(columns)
             line_elements[columns.locus_name.value] = self._serialize_locus_name()
@@ -651,22 +726,7 @@ class ProteinLine(Line):
             line_elements[columns.empai.value] = self._serialize_empai()
             line_elements[columns.description_name.value] = self._serialize_description_name()
 
-        elif version == "v2.1.13":
-            columns = ProteinLineColumns_v2_1_13
-            line_elements = [""] * len(columns)
-            line_elements[columns.locus_name.value] = self._serialize_locus_name()
-            line_elements[columns.sequence_count.value] = self._serialize_sequence_count()
-            line_elements[columns.spectrum_count.value] = self._serialize_spectrum_count()
-            line_elements[columns.sequence_coverage.value] = self._serialize_sequence_coverage()
-            line_elements[columns.length.value] = self._serialize_length()
-            line_elements[columns.molWt.value] = self._serialize_molWt()
-            line_elements[columns.pi.value] = self._serialize_pi()
-            line_elements[columns.validation_status.value] = self._serialize_validation_status()
-            line_elements[columns.nsaf.value] = self._serialize_nsaf()
-            line_elements[columns.empai.value] = self._serialize_empai()
-            line_elements[columns.description_name.value] = self._serialize_description_name()
-
-        elif version == "v2.1.12_paser":
+        elif version == "v2.1.12_paser" or version == "v2.1.13_timscore":
             columns = ProteinLineColumns_v2_1_12_paser
             line_elements = [""] * len(columns)
             line_elements[columns.locus_name.value] = self._serialize_locus_name()

@@ -1,4 +1,4 @@
-from senpy.ms2.parser import read_file, write_file
+from src.senpy.ms2.fast_parser import read_file, write_file
 
 
 h_lines, s_lines = read_file("..\\sample_files\\sample.ms2")

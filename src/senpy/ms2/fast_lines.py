@@ -1,12 +1,10 @@
-import ast
 from dataclasses import dataclass
-from enum import Enum
 from typing import List, Dict, Union
 import numpy as np
 
-from ..ms2 import exceptions as ms2_exceptions
-from ..ms2.columns import PeakLineColumns, ZLineColumns, ILineColumns, SLineColumns
-from ..ms2.lines import ILine as ms2_ILine
+from . import exceptions as ms2_exceptions
+from .columns import PeakLineColumns, ZLineColumns, ILineColumns, SLineColumns
+from .lines import ILine as ms2_ILine, Ms2Spectra
 
 
 @dataclass
@@ -29,6 +27,13 @@ class PeakLine:
         line_elements = self.line.rstrip().split(" ")
         return line_elements[PeakLineColumns.intensity.value]
 
+    def serialize(self) -> str:
+        return self.line
+
+    @staticmethod
+    def deserialize(line: str) -> 'PeakLine':
+        return PeakLine(line)
+
 
 @dataclass
 class HLine:
@@ -44,6 +49,13 @@ class HLine:
     def get_info(self):
         line_elements = self.line.rstrip().split("\t")
         return "\t".join(line_elements[1:])
+
+    def serialize(self) -> str:
+        return self.line
+
+    @staticmethod
+    def deserialize(line: str) -> 'HLine':
+        return HLine(line)
 
 
 @dataclass
@@ -65,6 +77,12 @@ class ZLine:
         line_elements = self.line.rstrip().split("\t")
         return line_elements[ZLineColumns.mass.value]
 
+    def serialize(self) -> str:
+        return self.line
+
+    @staticmethod
+    def deserialize(line: str) -> 'ZLine':
+        return ZLine(line)
 
 
 @dataclass
@@ -88,6 +106,12 @@ class ILine:
         line_elements = self.line.rstrip().split("\t")
         return line_elements[ILineColumns.val.value]
 
+    def serialize(self) -> str:
+        return self.line
+
+    @staticmethod
+    def deserialize(line: str) -> 'ILine':
+        return ILine(line)
 
 @dataclass
 class SLine:
@@ -113,9 +137,15 @@ class SLine:
         line_elements = self.line.rstrip().split("\t")
         return line_elements[SLineColumns.mz.value]
 
+    def serialize(self) -> str:
+        return self.line
+
+    @staticmethod
+    def deserialize(line: str) -> 'SLine':
+        return SLine(line)
 
 @dataclass
-class Ms2Spectra:
+class Ms2SpectraFast(Ms2Spectra):
     """
     Dataclass tp store Ms2Spectra Line Types. Each Ms2Spectra contains:
         1 SLine
@@ -128,7 +158,6 @@ class Ms2Spectra:
     i_lines: List[ILine]
     z_line: ZLine
     peak_lines: List[PeakLine]
-
     i_line_dict = None
 
     def get_mz_spectra(self):
@@ -147,96 +176,10 @@ class Ms2Spectra:
             return self.i_line_dict[keyword]
         return None
 
-    def get_parent_id(self, keyword=None) -> Union[str, None]:
-        if keyword is None:
-            keyword = ms2_ILine.PARENT_ID_KEYWORD
-
-        val = self.get_i_line_value(keyword)  # none/str
-        return val
-
-    def get_precursor_id(self, keyword=None) -> Union[str, None]:
-        if keyword is None:
-            keyword = ms2_ILine.PRECURSOR_ID_KEYWORD
-
-        val = self.get_i_line_value(keyword)  # none/str
-        return val
-
-    def get_retention_time(self, keyword=None) -> Union[str, None]:
-        if keyword is None:
-            keyword = ms2_ILine.RETENTION_TIME_KEYWORD
-
-        val = self.get_i_line_value(keyword)  # none/str
-        return val
-
-    def get_collision_energy(self, keyword=None) -> Union[str, None]:
-        if keyword is None:
-            keyword = ms2_ILine.COLLISION_ENERGY_KEYWORD
-
-        val = self.get_i_line_value(keyword)  # none/str
-        return val
-
-    def get_ook0(self, keyword=None) -> Union[str, None]:
-        if keyword is None:
-            keyword = ms2_ILine.OOK0_KEYWORD
-
-        val = self.get_i_line_value(keyword)  # none/str
-        return val
-
-    def get_ccs(self, keyword=None) -> Union[str, None]:
-        if keyword is None:
-            keyword = ms2_ILine.CCS_KEYWORD
-
-        val = self.get_i_line_value(keyword)  # none/str
-        return val
-
-    def get_precursor_intensity(self, keyword=None) -> Union[str, None]:
-        if keyword is None:
-            keyword = ms2_ILine.PRECURSOR_INTENSITY_KEYWORD
-
-        val = self.get_i_line_value(keyword)  # none/str
-        return val
-
-    def get_ook0_spectra(self, keyword=None) -> Union[str, None]:
-        if keyword is None:
-            keyword = ms2_ILine.OOK0_SPECTRA_KEYWORD
-
-        val = self.get_i_line_value(keyword)  # none/str
-        return val
-
-    def get_ccs_spectra(self, keyword=None) -> Union[str, None]:
-        if keyword is None:
-            keyword = ms2_ILine.CCS_SPECTRA_KEYWORD
-
-        val = self.get_i_line_value(keyword)  # none/str
-        return val
-
-    def get_mobility_intensity_spectra(self, keyword=None) -> Union[str, None]:
-        if keyword is None:
-            keyword = ms2_ILine.INTENSITY_SPECTRA_KEYWORD
-
-        val = self.get_i_line_value(keyword)  # none/str
-        return val
-
-    def get_mobility_mz_spectra(self, keyword=None) -> Union[List[float], None]:
-        if keyword is None:
-            keyword = ms2_ILine.MZ_SPECTRA_KEYWORD
-
-        val = self.get_i_line_value(keyword)  # none/str
-        return val
-
-    def serialize(self) -> str:
-        lines = [self.s_line] + self.i_lines + [self.z_line] + self.peak_lines
-        return ''.join([line.serialize() for line in lines])
-
     @staticmethod
     def create(low_scan: int, high_scan: int, mz: float, charge: int, mass: float, mz_spectra: np.ndarray,
                intensity_spectra: np.ndarray, info_dict: Dict[str, str]) -> 'Ms2Spectra':
-        s_line = SLine(low_scan=low_scan, high_scan=high_scan, mz=mz)
-        i_lines = [ILine(keyword=key, value=value) for key, value in info_dict.items()]
-        z_line = ZLine(charge=charge, mass=mass)
-        peak_lines = [PeakLine(mz=mz, intensity=intensity) for mz, intensity in zip(mz_spectra, intensity_spectra)]
-        precursor_spectra = Ms2Spectra(s_line=s_line, i_lines=i_lines, z_line=z_line, peak_lines=peak_lines)
-        return precursor_spectra
+        pass
 
 
 def parse_ms2_line(line: str) -> Union[HLine, SLine, ILine, ZLine, PeakLine]:

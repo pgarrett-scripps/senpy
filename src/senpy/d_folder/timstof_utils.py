@@ -5,8 +5,8 @@ from tqdm import tqdm
 import numpy as np
 import math
 
-from senpy.d_folder.tables import FramesTableItem
-from senpy.d_folder.tables import PrecursorsTableItem
+from .tables import FramesTableItem
+from .tables import PrecursorsTableItem
 
 
 def find_nearest_idx(array, value):

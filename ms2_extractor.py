@@ -4,14 +4,14 @@ import time
 
 from tqdm import tqdm
 
-from senpy.d_folder.tables import get_frame_table_items
-from senpy.d_folder.tables import get_pasef_frame_msms_table_items
-from senpy.d_folder.tables import get_precursors_table_items
-from senpy.d_folder.timsdata import TimsData, oneOverK0ToCCSforMz
-from senpy.d_folder.timstof_utils import build_precursor_to_mobility_spectra_map, \
+from src.senpy.d_folder.tables import get_frame_table_items
+from src.senpy.d_folder.tables import get_pasef_frame_msms_table_items
+from src.senpy.d_folder.tables import get_precursors_table_items
+from src.senpy.d_folder.timsdata import TimsData, oneOverK0ToCCSforMz
+from src.senpy.d_folder.timstof_utils import build_precursor_to_mobility_spectra_map, \
     build_frame_id_ms1_scan_map, build_parent_id_to_precursors_map
 
-from senpy.ms2.lines import Ms2Spectra, ILine
+from src.senpy.ms2.lines import Ms2Spectra, ILine
 
 PROTON_MASS = 1.007276466
 VERSION = '0.0.1'
@@ -52,7 +52,7 @@ def parse_args():
     return _parser.parse_args()
 
 
-def get_ms2_header(version, ppm, last_scan, tdf_sdk_path):
+def get_ms2_header(version, ppm, last_scan):
     ms2_header = 'H\tExtractor\tTimsTOF_extractor\n' \
                  'H\tExtractorVersion\t{}\n' \
                  'H\tPublicationDate\t20-02-2020\n' \

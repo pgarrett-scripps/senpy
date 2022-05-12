@@ -1,6 +1,7 @@
-from senpy.dtaSelectFilter.parser import read_file
+from src.senpy.dtaSelectFilter.parser import read_file, write_file
 
 
-fpr = read_file("C:\data\GoldenData\DTASelect-filter.txt")
-print(fpr[0])
+_1, fpr, _2 = read_file("..\sample_files\DTASelect-filter.txt")
+
+write_file(_1, fpr, _2, "..\\tmp\\DTASelect-filter.txt")
 

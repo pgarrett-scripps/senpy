@@ -1,7 +1,5 @@
-from tqdm import tqdm
-
-from senpy.sqt.lines import SLine, parse_sqt_line, MLine, LLine
-from senpy.util import HLine
+from .lines import SLine, parse_sqt_line, MLine, LLine
+from ..util import HLine
 
 
 def read_file(file_path: str, version='auto') -> ([str], [SLine]):
@@ -16,7 +14,7 @@ def read_file(file_path: str, version='auto') -> ([str], [SLine]):
     h_lines, s_lines = [], []
 
     with open(file_path) as file:
-        for line in tqdm(file):
+        for line in file:
 
             if line == "" or line == "\n":
                 continue

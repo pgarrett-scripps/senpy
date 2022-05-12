@@ -30,6 +30,7 @@ def parse_args():
 def _get_latest_search_dir(experiment_path):
     search_folder_path = os.path.join(experiment_path, "search", "*")
     searches = glob(search_folder_path, recursive=True)
+    searches.remove('luciphor_ptm_out_final.txt')
     search_times = [os.path.getctime(search) for search in searches]
     latest_search = searches[np.argmax(search_times)]
     return latest_search
@@ -56,6 +57,7 @@ def assert_file_exist(pth):
 
 def main(project_path, output_dir=None):
     ip2_search_paths = get_latest_project_search_dirs(project_path)
+    print([glob(os.path.join(pth, "*.ms2"), recursive=True) for pth in ip2_search_paths])
     ms2_file_paths = [glob(os.path.join(pth, "*.ms2"), recursive=True)[0] for pth in ip2_search_paths]
     dta_filter_file_paths = [os.path.join(pth, "DTASelect-filter.txt") for pth in ip2_search_paths]
 

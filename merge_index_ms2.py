@@ -34,7 +34,6 @@ def main(ms2_path, index_path):
             ms2_index_spectra.peak_lines = precursor_id_to_peak_lines_map[prec_id]
 
     os.rename(ms2_path, ms2_path + ".bak")
-    time.sleep(5)
 
     # convert to timscore
     for spectra in ms2_index_spectras:
@@ -48,4 +47,6 @@ def main(ms2_path, index_path):
 
 if __name__ == '__main__':
     args = parse_args()
+    print(args)
     main(ms2_path=args.ms2_path, index_path=args.ms2_index_path)
+    print("done!")

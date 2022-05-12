@@ -1,6 +1,6 @@
 from typing import List
 
-from reader_stats import ReaderStats
+from ..reader_stats import ReaderStats
 from .lines import SLine, HLine, ZLine, PeakLine, ILine, Ms2Spectra, parse_ms2_line
 
 

@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 import time
 
-
 @dataclass
 class ReaderStats:
     print_freq: int

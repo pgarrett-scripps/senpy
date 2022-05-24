@@ -1,8 +1,5 @@
 import argparse
 import os
-import time
-
-from tqdm import tqdm
 
 from src.senpy.d_folder.tables import get_frame_table_items
 from src.senpy.d_folder.tables import get_pasef_frame_msms_table_items
@@ -112,7 +109,7 @@ def extract_ms2_file(analysis_dir: str,
     ms2_header = get_ms2_header(version=VERSION, ppm=ppm, last_scan=len(pasef_frame_msms_table_items))
     with open(output_file, 'w') as out_file:
         out_file.write(ms2_header)
-        for item in tqdm(precursors_table_items):
+        for item in precursors_table_items:
 
             if item.monoisotopic_mz is None or item.charge is None:
                 continue
@@ -138,7 +135,7 @@ def extract_ms2_file(analysis_dir: str,
                  ILine.PRECURSOR_ID_KEYWORD: f"{item.id}",
                  ILine.OOK0_KEYWORD: f"{ook0:.4f}",
                  ILine.CCS_KEYWORD: f"{ccs:.4f}",
-                 ILine.RETENTION_TIME_KEYWORD: f"{frame_table_items[item.parent_frame].time:.4f}",
+                 ILine.RETENTION_TIME_KEYWORD: f"{frame_table_items[item.parent_frame - 1].time:.4f}",
                  ILine.COLLISION_ENERGY_KEYWORD: f"{precursor_pasef_frame_msms_info_item.collision_energy:.4f}",
                  ILine.ISOLATION_MZ_KEYWORD: f"{precursor_pasef_frame_msms_info_item.isolation_mz:.4f}",
                  ILine.ISOLATION_WIDTH_KEYWORD: f"{precursor_pasef_frame_msms_info_item.isolation_width:.4f}",

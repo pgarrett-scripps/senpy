@@ -181,6 +181,7 @@ class PeptideLine(Line):
             experimental_mz = None
             corrected_1k0 = None
             ion_mobility = None
+            
         elif version == "v2.1.13_timscore":
             columns = PeptideLineColumns_v2_1_13_timscore
 

@@ -1,6 +1,7 @@
 import argparse
 import os.path
 from glob import glob
+from src.senpy.sqt.parser import read_file, write_file
 
 import numpy as np
 
@@ -22,7 +23,6 @@ def parse_args():
     # Parse Arguments
     _parser = argparse.ArgumentParser(description='Arguments for Ip2 project extractor')
     _parser.add_argument('--project_path', required=True, type=str, help='path to ip2 project')
-    _parser.add_argument('--output_dir', required=False, type=str, help='path to output dir')
 
     return _parser.parse_args()
 
@@ -55,27 +55,28 @@ def assert_file_exist(pth):
     assert (os.path.isfile(pth))
 
 
-def main(project_path, output_dir=None):
+def set_timsscore_to_zero(sqt_path):
+    h_lines, s_lines = read_file(sqt_path)
+
+    for s_line in s_lines:
+        for m_line in s_line.m_lines:
+            m_line.tims_score = 0
+            m_line.predicted_ook0 = s_line.experimental_ook0
+
+    write_file(h_lines, s_lines, sqt_path+".zero", version='v2.1.0_ext')
+
+
+def main(project_path):
     ip2_search_paths = get_latest_project_search_dirs(project_path)
-    print([glob(os.path.join(pth, "*.ms2"), recursive=True) for pth in ip2_search_paths])
-    ms2_file_paths = [glob(os.path.join(pth, "*.ms2"), recursive=True)[0] for pth in ip2_search_paths]
-    dta_filter_file_paths = [os.path.join(pth, "DTASelect-filter.txt") for pth in ip2_search_paths]
-
+    sqt_file_path = [glob(os.path.join(pth, "*.sqt"), recursive=True)[0] for pth in ip2_search_paths]
+    print(sqt_file_path)
     # Check that all files exists
-    [assert_file_exist(pth) for pth in ms2_file_paths]
-    [assert_file_exist(pth) for pth in dta_filter_file_paths]
+    [assert_file_exist(pth) for pth in sqt_file_path]
 
-    for ms2_file_path, dta_filter_file_path in zip(ms2_file_paths,dta_filter_file_paths):
+    for sqt_file in sqt_file_path:
 
-        if output_dir:
-            out_file_path = os.path.join(output_dir, os.path.basename(ms2_file_path) + ".out")
-        else:
-            out_file_path = os.path.splitext(ms2_file_path)[0] + ".out"
-
-        generate_output(ms2_path=ms2_file_path, filter_path=dta_filter_file_path,
-                        out_path=out_file_path, dta_filter_version="v2.1.13_timscore")
-
+        set_timsscore_to_zero(sqt_file)
 
 if __name__ == '__main__':
     args = parse_args()
-    main(project_path=args.project_path, output_dir=args.output_dir)
+    main(project_path=args.project_path)

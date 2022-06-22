@@ -4,8 +4,8 @@ import os
 import numpy as np
 from matplotlib import pyplot as plt
 
-from src.senpy.dtaSelectFilter.parser import read_file as parse_dta_filter_file
-from src.senpy.sqt.parser import read_file as parse_sqt_file
+from src.senpy.ms2.parser import read_file as read_ms2
+from src.senpy.sqt.parser import read_file as read_sqt
 
 
 def parse_args():
@@ -36,27 +36,22 @@ def dta_select(dta_select_filter_file):
 def sqt_select(sqt_file):
 
     xcorrs = []
-    h_lines, s_lines = parse_sqt_file(sqt_file)
+    h_lines, s_lines = read_sqt_file(sqt_file)
     for s_line in s_lines:
         for m_line in s_line.m_lines:
             if not m_line.is_reverse():
                 xcorrs.append(m_line.xcorr)
 
     percentile_xcorr = np.percentile(xcorrs, 95)
-    print(percentile_xcorr)
 
-    ppms = {}
+    ppms = []
     for s_line in s_lines:
         for m_line in s_line.m_lines:
             if not m_line.is_reverse() and m_line.xcorr >= percentile_xcorr:
-                if s_line.charge not in ppms:
-                    ppms[s_line.charge] = []
-                ppms[s_line.charge].append((m_line.calculated_mass - s_line.experimental_mass)/m_line.calculated_mass*1_000_000)
+                ppms.append((m_line.calculated_mass - s_line.experimental_mass)/m_line.calculated_mass*1_000_000)
 
-    for charge in ppms:
-        plt.hist(ppms[charge], bins = 50, label=charge)
-        plt.legend()
-        plt.show()
+    plt.hist(ppms, bins = 50)
+    plt.show()
 
     print(np.mean(ppms))
 

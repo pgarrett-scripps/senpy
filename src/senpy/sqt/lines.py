@@ -1,11 +1,10 @@
 from dataclasses import dataclass, field
 from typing import List, ClassVar, Union
 
-from senpy.sqt.columns import LLineColumns, MLineColumns, MLineColumns_v2_1_0, MLineColumns_v2_1_0_ext, SLineColumns, \
+from . import exceptions as sqt_exceptions
+from .columns import LLineColumns, MLineColumns, MLineColumns_v2_1_0, MLineColumns_v2_1_0_ext, SLineColumns, \
     SLineColumns_v2_1_0, SLineColumns_v2_1_0_ext
-from senpy.sqt import exceptions as sqt_exceptions
-from senpy.util import HLine
-
+from ..util import HLine
 
 @dataclass
 class LLine:

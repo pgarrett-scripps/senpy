@@ -5,6 +5,17 @@ from typing import List
 from .experiment import get_latest_search_from_experiment, get_oldest_search_from_experiment, \
     get_searches_from_experiment, get_search_by_id_from_experiment
 
+# IP2 Files Structure:
+# Project_Name <-- project_path
+#   Experiments*
+#       search
+#           searches*
+#       spectra
+#           ms2
+#   default_params
+#   tmp_bulk_upload
+#   activeExptList.txt
+
 ITEMS_TO_REMOVE = ['default_params', 'tmp_bulk_upload', 'activeExpList.txt']
 
 

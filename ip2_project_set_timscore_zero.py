@@ -1,29 +1,11 @@
 import argparse
 import os.path
-from glob import glob
 from pathlib import Path
 
-from senpy.ip2_project.file_types import Ip2FileType
-from senpy.ip2_project.search import get_file_from_search
+from src.senpy.ip2_project.file_types import Ip2FileType
+from src.senpy.ip2_project.search import get_file_from_search
 from src.senpy.ip2_project.project import get_latest_search_per_experiment, get_searches_matching_ids
 from src.senpy.sqt.parser import read_file, write_file
-
-import numpy as np
-
-from generate_output import generate_output
-
-
-# IP2 Files Structure:
-# Project_Name <-- project_path
-#   Experiments*
-#       search
-#           searches*
-#       spectra
-#           ms2
-#   default_params
-#   tmp_bulk_upload
-#   activeExptList.txt
-
 
 def parse_args():
     # Parse Arguments

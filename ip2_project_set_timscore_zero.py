@@ -42,7 +42,7 @@ def convert_projects(project, search_ids=None):
     for sqt in sqt_files:
         print(sqt)
 
-    con = input("continue: yes/no")
+    con = input("continue: yes/no\n")
     if con == 'no':
         print('Quiting')
         return

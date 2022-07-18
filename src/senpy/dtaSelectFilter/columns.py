@@ -172,3 +172,5 @@ class ProteinLineColumns_v2_1_13_timscore(Enum):
     description_name = 10
     h_redundancy = 11
     l_redundancy = 12
+    m_redundancy = 13
+

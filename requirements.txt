@@ -1,4 +1,12 @@
-numpy~=1.20.1
+numpy~=1.22.3
 setuptools~=52.0.0
 matplotlib~=3.3.4
 tqdm~=4.59.0
+senpy~=0.0.2
+path~=15.1.2
+numba~=0.53.1
+pandas~=1.2.4
+scipy~=1.6.2
+deeplc~=1.0.1
+future~=0.18.2
+pyteomics~=4.5.3

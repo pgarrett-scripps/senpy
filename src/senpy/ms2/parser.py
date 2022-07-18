@@ -1,7 +1,88 @@
 from typing import List
 
-from ..reader_stats import ReaderStats
 from .lines import SLine, HLine, ZLine, PeakLine, ILine, Ms2Spectra, parse_ms2_line
+
+
+def return_lines(file):
+    lines = []
+    with open(file) as f:
+        for line in f:
+            lines.append(line)
+
+    return lines
+
+
+def get_index_of_first_s_line(lines):
+    for i, line in enumerate(lines):
+        if line[0] == SLine.LETTER:
+            return i
+
+
+def filter_ms2_lines(lines):
+    spectra_lines = []
+    for line in lines:
+        if line[0] == SLine.LETTER and len(spectra_lines) != 0:
+            yield spectra_lines
+            spectra_lines = []
+        spectra_lines.append(line)
+    return spectra_lines
+
+
+def filter_ms2_lines_from_file(file):
+    start = False
+    spectra_lines = []
+    with open(file) as f:
+        for line in f:
+
+            if not start and line[0] != SLine.LETTER:
+                continue
+            else:
+                start = True
+
+            if line[0] == SLine.LETTER and len(spectra_lines) > 0:
+                yield spectra_lines
+                spectra_lines = []
+            spectra_lines.append(line)
+    return spectra_lines
+
+
+def convert_lines_to_ms2_spectra(spectra_lines):
+    from .lines import SLine, HLine, ZLine, PeakLine, ILine, Ms2Spectra, parse_ms2_line
+    s_line, z_line, i_lines, peak_lines = None, None, [], []
+
+    for line in spectra_lines:
+        ms2_line = parse_ms2_line(line)
+        if isinstance(ms2_line, SLine):
+            s_line = ms2_line
+        elif isinstance(ms2_line, ILine):
+            i_lines.append(ms2_line)
+        elif isinstance(ms2_line, ZLine):
+            z_line = ms2_line
+        elif isinstance(ms2_line, PeakLine):
+            peak_lines.append(ms2_line)
+        else:
+            raise Exception
+
+    return Ms2Spectra(s_line=s_line,
+                      z_line=z_line,
+                      i_lines=i_lines,
+                      peak_lines=peak_lines
+                      )
+
+
+def multi_process_spectra(n, lines_list):
+    from multiprocess import Pool
+    with Pool(processes=n) as pool:
+        results = pool.map(convert_lines_to_ms2_spectra, lines_list)
+    return results
+
+
+def read_file_multiprocess(file_path) -> (List[HLine], List[Ms2Spectra]):
+    lines = return_lines(file_path)
+    index_of_first_s_line = get_index_of_first_s_line(lines)
+    h_lines = lines[:index_of_first_s_line]
+    ms2_lines_list = filter_ms2_lines(lines[index_of_first_s_line:])
+    ms2_spectras = multi_process_spectra(8, ms2_lines_list)
 
 
 def read_file(file_path) -> (List[HLine], List[Ms2Spectra]):
@@ -81,10 +162,10 @@ def read_file_incrementally(file_path) -> List[Ms2Spectra]:
                 peak_lines.append(ms2_line)
 
     return Ms2Spectra(s_line=s_line,
-                          z_line=z_line,
-                          i_lines=i_lines,
-                          peak_lines=peak_lines
-                          )
+                      z_line=z_line,
+                      i_lines=i_lines,
+                      peak_lines=peak_lines
+                      )
 
 
 def write_file(h_lines: List[HLine], ms2_spectras: List[Ms2Spectra], out_file_path: str) -> None:

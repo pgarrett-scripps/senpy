@@ -10,6 +10,9 @@ from path import Path
 print(os.getcwd())
 print(sys.platform[:5])
 
+import pathlib
+print()
+
 def get_dll(tdfsdk_path: str):
     if sys.platform[:5] == "win32":
         libname = os.path.join(tdfsdk_path, "win64", "timsdata.dll")
@@ -24,9 +27,8 @@ def get_dll(tdfsdk_path: str):
     dll = cdll.LoadLibrary(libname)
     return dll
 
-
 try:
-    dll = get_dll(Path("src/senpy/d_folder/tdf-sdk-2.8.7"))
+    dll = get_dll(os.path.join(os.path.dirname(os.path.abspath(__file__)), "tdf-sdk-2.8.7"))
 except Exception as e:
     dll = get_dll(Path("tdf-sdk-2.8.7"))
 

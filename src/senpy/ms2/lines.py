@@ -18,7 +18,7 @@ class PeakLine(Line):
         982.1023	120.0
     """
 
-    mz: np.float32
+    mz: np.float64
     intensity: np.float32
 
     MZ_PRECISION: ClassVar[int] = 5
@@ -265,6 +265,15 @@ class Ms2Spectra:
     i_line_dict = None
 
     __slots__ = 's_line', 'i_lines', 'z_line', 'peak_lines'
+
+    def get_precursor_mass(self):
+        return self.z_line.mass
+
+    def get_precursor_charge(self):
+        return self.z_line.charge
+
+    def get_precursor_mz(self):
+        return self.s_line.mz
 
     def get_mz_spectra(self):
         return [peak_line.mz for peak_line in self.peak_lines]

@@ -43,7 +43,7 @@ def read_file(dta_select_filter_file_path: str, version: str = None) -> ([str], 
                         print("version: ", version)
 
             if file_state == FileState.DATA:
-                if line_elements[0] == '' or line_elements[0] == '*':
+                if line_elements[0] == '' or '*' in line_elements[0] or line_elements[0].isnumeric():
                     peptide_lines.append(PeptideLine.deserialize(line, version=version))
                 else:
                     if protein_line is not None:

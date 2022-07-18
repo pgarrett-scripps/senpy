@@ -29,7 +29,7 @@ def set_timsscore_to_zero(sqt: Path):
             m_line.tims_score = 0
             m_line.predicted_ook0 = s_line.experimental_ook0
 
-    write_file(h_lines, s_lines, str(sqt) + ".zero", version='v2.1.0_ext')
+    write_file(h_lines, s_lines, str(sqt), version='v2.1.0_ext')
 
 
 def convert_projects(project, search_ids=None):

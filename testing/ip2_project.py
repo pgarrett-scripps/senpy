@@ -2,7 +2,7 @@ from pathlib import Path
 
 from src.senpy.ip2_project.experiment import get_searches_from_experiment, get_search_by_id_from_experiment, get_latest_search_from_experiment, get_oldest_search_from_experiment
 from src.senpy.ip2_project.project import get_experiments_in_project, get_searches_matching_ids
-from src.senpy.ip2_project.search import get_file_from_search
+from src.senpy.ip2_project.search import get_file_from_search, remove_dta_files_from_search
 from src.senpy.ip2_project.file_types import Ip2FileType
 
 ip2_project = r"C:\data\test_ip2_project"
@@ -27,3 +27,9 @@ for file_type in Ip2FileType:
 print(get_searches_matching_ids(Path(ip2_project), ['157895', '157896']))
 
 print(str(get_oldest_search_from_experiment(Path(experiment))))
+
+
+searches = get_searches_matching_ids(Path(ip2_project), ['157895', '157896'])
+for search in searches:
+    pass
+    #remove_dta_files_from_search(search)

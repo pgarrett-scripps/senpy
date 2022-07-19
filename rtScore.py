@@ -118,7 +118,7 @@ def generate_rt_score_sqt(sqt_file, ms2_file, out_file, retention_time_keyword):
         s_line.experimental_ook0 = experimental_rt
         for m_line in s_line.m_lines:
             sequence = m_line.sequence
-            if sequence in pred_rt_by_seq_dict:
+            if sequence in pred_rt_by_seq_dict and m_line.xcorr != 0:
                 predicted_rt = pred_rt_by_seq_dict[sequence]
                 error = experimental_rt - predicted_rt
                 timsscore = calculate_score(error, rt_std)

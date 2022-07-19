@@ -1,15 +1,18 @@
 import argparse
 import re
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
 from deeplc import DeepLC
 import scipy.stats as stats
 
+from senpy.ip2_project.file_types import Ip2FileType
+from senpy.ip2_project.project import get_latest_search_per_experiment, get_searches_matching_ids
+from senpy.ip2_project.search import get_file_from_search
 from src.senpy.ms2.lines import ILine
 from src.senpy.ms2 import fast_parser as fast_ms2_parser
 from src.senpy.sqt import parser as sqt_parser
-
 
 MOD_MAP = {}
 MOD_MAP['(15.994915)'] = 'Oxidation'
@@ -19,12 +22,14 @@ MOD_MAP['(0.984016)'] = 'Deamidated'
 def parse_args():
     # Parse Arguments
     _parser = argparse.ArgumentParser(description='Arguments for Ms2 Extractor')
-    _parser.add_argument('--sqt', required=True, type=str,
+    _parser.add_argument('--sqt', required=False, type=str,
                          help='path to sqt file')
-    _parser.add_argument('--ms2', required=True, type=str, default=None,
+    _parser.add_argument('--ms2', required=False, type=str, default=None,
                          help='path to ms2 file')
     _parser.add_argument('--out', required=False, type=str, default=None,
                          help='path to out sqt file')
+    _parser.add_argument('-p', '--project', required=False, type=lambda p: Path(p).absolute(), help='path to ip2 project')
+    _parser.add_argument('-i', '--search_ids', nargs='+', required=False, type=str, help='experiment to convert')
     _parser.add_argument('--retention_time_keyword', required=False, type=str, default=ILine.RETENTION_TIME_KEYWORD,
                          help='I line keyword for retention time')
 
@@ -100,7 +105,8 @@ def generate_rt_score_sqt(sqt_file, ms2_file, out_file, retention_time_keyword):
     prediction_df['pred_rt'] = dlc.make_preds(seq_df=prediction_df)
 
     prediction_df_targets = prediction_df[
-        (prediction_df.xcorr >= x_corr_percentile) & (prediction_df.reverse == False) & (prediction_df.m_line_number == 0)]
+        (prediction_df.xcorr >= x_corr_percentile) & (prediction_df.reverse == False) & (
+                    prediction_df.m_line_number == 0)]
 
     pred_error = prediction_df_targets.tr - prediction_df_targets.pred_rt
     pred_rt_by_seq_dict = {seq: rt for seq, rt in zip(prediction_df.ip2_seq, prediction_df.pred_rt)}
@@ -125,11 +131,28 @@ def generate_rt_score_sqt(sqt_file, ms2_file, out_file, retention_time_keyword):
 
     sqt_parser.write_file(_, s_lines, out_file, version="v2.1.0_ext")
 
+
 if __name__ == '__main__':
     args = parse_args()
 
-    if args.out is None:
-        args.out = args.sqt + ".rtscore"
     print(args)
-    generate_rt_score_sqt(args.sqt, args.ms2, args.out, retention_time_keyword=args.retention_time_keyword)
 
+    if args.project and args.search_ids:
+        searches = get_searches_matching_ids(args.project, args.search_ids)
+        sqt_files = [get_file_from_search(search, Ip2FileType.SQT) for search in searches]
+        ms2_files = [get_file_from_search(search, Ip2FileType.MS2) for search in searches]
+
+        print("sqt_files: ", sqt_files)
+        print("ms2_files: ", ms2_files)
+        con = input("continue: yes/no\n")
+        if con != "yes":
+            quit(1)
+
+        for ms2, sqt in zip(ms2_files, sqt_files):
+            print(str(ms2).split("\\")[-1])
+            generate_rt_score_sqt(str(sqt), str(ms2), str(sqt), retention_time_keyword=args.retention_time_keyword)
+
+    if args.sqt and args.ms2:
+        if args.out is None:
+            args.out = args.sqt
+        generate_rt_score_sqt(args.sqt, args.ms2, args.out, retention_time_keyword=args.retention_time_keyword)

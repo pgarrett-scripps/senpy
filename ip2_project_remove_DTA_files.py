@@ -7,6 +7,7 @@ from src.senpy.ip2_project.search import get_file_from_search
 from src.senpy.ip2_project.project import get_latest_search_per_experiment, get_searches_matching_ids
 from src.senpy.sqt.parser import read_file, write_file
 
+
 def parse_args():
     # Parse Arguments
     _parser = argparse.ArgumentParser(description='Arguments for Ip2 project extractor')

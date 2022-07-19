@@ -6,9 +6,9 @@ import pandas as pd
 from deeplc import DeepLC
 import scipy.stats as stats
 
-from senpy.ms2.lines import ILine
-from senpy.ms2_fast import parser as fast_ms2_parser
-from senpy.sqt import parser as sqt_parser
+from src.senpy.ms2.lines import ILine
+from src.senpy.ms2 import fast_parser as fast_ms2_parser
+from src.senpy.sqt import parser as sqt_parser
 
 
 MOD_MAP = {}

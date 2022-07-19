@@ -7,9 +7,9 @@ import pandas as pd
 from deeplc import DeepLC
 import scipy.stats as stats
 
-from senpy.ip2_project.file_types import Ip2FileType
-from senpy.ip2_project.project import get_latest_search_per_experiment, get_searches_matching_ids
-from senpy.ip2_project.search import get_file_from_search
+from src.senpy.ip2_project.file_types import Ip2FileType
+from src.senpy.ip2_project.project import get_latest_search_per_experiment, get_searches_matching_ids
+from src.senpy.ip2_project.search import get_file_from_search
 from src.senpy.ms2.lines import ILine
 from src.senpy.ms2 import fast_parser as fast_ms2_parser
 from src.senpy.sqt import parser as sqt_parser

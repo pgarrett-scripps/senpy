@@ -37,7 +37,7 @@ def main(ms2_path, index_path):
 
     # convert to timscore
     for spectra in ms2_index_spectras:
-        for i_line in spectra.i_lines:
+        for i_line in spectra.i_line_dict:
             if "Spectra" not in i_line.line:
                 i_line.line = i_line.line.replace(FILE_OOK0_KEY, TIMSCORE_OOK0_KEY)
                 i_line.line = i_line.line.replace(FILE_RETENTION_TIME_KEY, TIMSCORE_RETENTION_TIME_KEY)

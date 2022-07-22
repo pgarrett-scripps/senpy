@@ -79,6 +79,7 @@ def get_frame_table_items(conn: Connection) -> List[FramesTableItem]:
     items = []
     for row in rows:
         if len(row) == len(_FramesTableColumns):
+            print(row[_FramesTableColumns.msms_type.value])
             item = FramesTableItem(id=cast_int(row[_FramesTableColumns.id.value]),
                                    time=cast_float(row[_FramesTableColumns.time.value]),
                                    polarity=cast_str(row[_FramesTableColumns.polarity.value]),

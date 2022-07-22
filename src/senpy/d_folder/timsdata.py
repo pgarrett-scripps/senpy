@@ -5,13 +5,12 @@ from ctypes import *
 
 import numpy as np
 from numpy import unicode
-from path import Path
+from pathlib import Path
+
 
 print(os.getcwd())
 print(sys.platform[:5])
-
-import pathlib
-print()
+print(Path(__file__).parent.resolve())
 
 def get_dll(tdfsdk_path: str):
     if sys.platform[:5] == "win32":
@@ -28,9 +27,9 @@ def get_dll(tdfsdk_path: str):
     return dll
 
 try:
-    dll = get_dll(os.path.join(os.path.dirname(os.path.abspath(__file__)), "tdf-sdk-2.8.7"))
+    dll = get_dll(os.path.join(Path(__file__).parent.resolve(), "tdf-sdk-2.8.7"))
 except Exception as e:
-    dll = get_dll(Path("tdf-sdk-2.8.7"))
+    dll = get_dll(r"C:\Users\Ty\repos\senpy_package\src\senpy\d_folder\tdf-sdk-2.8.7")
 
 dll.tims_open.argtypes = [c_char_p, c_uint32]
 dll.tims_open.restype = c_uint64

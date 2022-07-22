@@ -6,7 +6,7 @@ h_lines, ms2_spectras = read_file("C:\\Users\\Ty\\Downloads\\prolucid_crash_gadi
 for ms2_spectra in ms2_spectras:
     if len(ms2_spectra.peak_lines) <= 10:
         print(ms2_spectra)
-    if len(ms2_spectra.i_lines) == 0:
+    if len(ms2_spectra.i_line_dict) == 0:
         print(ms2_spectra)
     if ms2_spectra.s_line == None:
         print(ms2_spectra)

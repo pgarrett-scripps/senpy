@@ -23,12 +23,12 @@ def get_table_rows(conn: Connection, table_name: TableNames) -> List[Any]:
 
 
 def cast_float(val: Any) -> Union[float, None]:
-    return float(val) if val else None
+    return None if val is None else float(val)
 
 
 def cast_int(val: Any) -> Union[int, None]:
-    return int(val) if val else None
+    return None if val is None else int(val)
 
 
 def cast_str(val: Any) -> Union[str, None]:
-    return str(val) if val else None
+    return None if val is None else str(val)

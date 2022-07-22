@@ -28,6 +28,8 @@ def parse_args():
                          help='path to ms2 file')
     _parser.add_argument('--out', required=False, type=str, default=None,
                          help='path to out sqt file')
+    _parser.add_argument('--newfile', required=False, action='store_true', default=None,
+                         help='path to out sqt file')
     _parser.add_argument('-p', '--project', required=False, type=lambda p: Path(p).absolute(), help='path to ip2 project')
     _parser.add_argument('-i', '--search_ids', nargs='+', required=False, type=str, help='experiment to convert')
     _parser.add_argument('--retention_time_keyword', required=False, type=str, default=ILine.RETENTION_TIME_KEYWORD,
@@ -138,6 +140,7 @@ if __name__ == '__main__':
     print(args)
 
     if args.project and args.search_ids:
+
         searches = get_searches_matching_ids(args.project, args.search_ids)
         sqt_files = [get_file_from_search(search, Ip2FileType.SQT) for search in searches]
         ms2_files = [get_file_from_search(search, Ip2FileType.MS2) for search in searches]
@@ -149,10 +152,13 @@ if __name__ == '__main__':
             quit(1)
 
         for ms2, sqt in zip(ms2_files, sqt_files):
+
+            if args.newfile:
+                args.out = Path(str(sqt) + ".rtscore")
             print(str(ms2).split("\\")[-1])
-            generate_rt_score_sqt(str(sqt), str(ms2), str(sqt), retention_time_keyword=args.retention_time_keyword)
+            generate_rt_score_sqt(str(sqt), str(ms2), str(args.out), retention_time_keyword=args.retention_time_keyword)
 
     if args.sqt and args.ms2:
-        if args.out is None:
-            args.out = args.sqt
+        if args.newfile:
+            args.out = Path(str(args.sqt) + ".rtscore")
         generate_rt_score_sqt(args.sqt, args.ms2, args.out, retention_time_keyword=args.retention_time_keyword)

@@ -27,7 +27,7 @@ def set_timsscore_to_zero(sqt: Path):
     for s_line in s_lines:
         for m_line in s_line.m_lines:
             m_line.tims_score = 0
-            m_line.predicted_ook0 = s_line.experimental_ook0
+            m_line.predicted_ook0 = 0
 
     write_file(h_lines, s_lines, str(sqt), version='v2.1.0_ext')
 

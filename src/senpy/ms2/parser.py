@@ -5,6 +5,7 @@ from .lines import SLine, HLine, ZLine, PeakLine, ILine, Ms2Spectra, parse_ms2_l
 
 def return_lines(file):
     lines = []
+
     with open(file) as f:
         for line in f:
             lines.append(line)

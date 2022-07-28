@@ -29,8 +29,9 @@ def convert_sqt_to_pin(sqt: str):
         pin_file.write(f"{'PSMId'}\t{'Label'}\t{'ScanNr'}\t{'ExpMass'}\t{'CalcMass'}\t"
                        f"{'seq_len'}\t{'charge1'}\t{'charge2'}\t{'charge3'}\t{'charge4'}\t{'SP'}\t"
                        f"{'aromaticity'}\t{'instability_index'}\t{'gravy'}\t{'helix'}\t{'turn'}\t{'sheet'}\t{'BB'}\t"
-                       #f"{'BB'}\t"
-                       f"{'TIMScore'}\t{'RTScore'}\t{'xcorr'}\t{'deltaCN'}\t{'Peptide'}\t{'Proteins'}\n")
+                       f"{'TIMScore'}\t"
+                       f"{'RTScore'}\t"
+                       f"{'xcorr'}\t{'deltaCN'}\t{'Peptide'}\t{'Proteins'}\n")
         id_index = 0
 
         for s_line in s_lines:
@@ -94,8 +95,10 @@ def convert_sqt_to_pin(sqt: str):
                 proteins_serialized = " ".join(proteins)
                 ExpMass = s_line.experimental_mass
                 CalcMass = m_line.calculated_mass
-                rtscore = 0 if m_line.tims_score is None else m_line.tims_score
-                timscore = 0 if m_line.predicted_ook0 is None else m_line.predicted_ook0
+                timscore = 0 if m_line.tims_score is None else m_line.tims_score
+                #timscore = 0 if m_line.predicted_ook0 is None else (s_line.corrected_ook0 - m_line.predicted_ook0)/s_line.corrected_ook0
+                rtscore = 0 if m_line.predicted_ook0 is None else m_line.predicted_ook0
+
 
                 charges = [0]*4
                 if charge == 1:
@@ -113,8 +116,9 @@ def convert_sqt_to_pin(sqt: str):
                                f"{seq_len}\t{charges[0]}\t{charges[1]}\t{charges[2]}\t{charges[3]}\t{sp}\t"
                                f"{get_aromaticity(unmod_seq)}\t{get_instability_index(unmod_seq)}\t{get_gravy(unmod_seq)}\t"
                                f"{get_helix(unmod_seq)}\t{get_turn(unmod_seq)}\t{get_sheet(unmod_seq)}\t{get_bb(unmod_seq)}\t"
-                               #f"{get_bb(unmod_seq)}\t"
-                               f"{timscore}\t{rtscore}\t{xcorr}\t{delta_cn}\t{peptide}\t{proteins_serialized}\n")
+                               f"{timscore}\t"
+                               f"{rtscore}\t"
+                               f"{xcorr}\t{delta_cn}\t{peptide}\t{proteins_serialized}\n")
                 id_index += 1
 
 

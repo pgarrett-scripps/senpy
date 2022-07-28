@@ -195,6 +195,6 @@ def parse_ms2_line(line: str) -> Union[HLine, SLine, ILine, ZLine, PeakLine]:
     elif line[0] == 'Z':
         return ZLine(line)
     elif line[0].isnumeric():
-        return None #PeakLine(line)
+        return PeakLine(line)
     else:
         raise ms2_exceptions.Ms2FileDeserializationUnsupportedLineException

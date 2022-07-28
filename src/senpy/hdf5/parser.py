@@ -7,28 +7,6 @@ import numpy as np
 from ..constants import PROTON_MASS
 from ..ms2.lines import Ms2Spectra, ILine
 
-key_to_value_map = {
-    ILine.PARENT_ID_KEYWORD: 0,
-    ILine.PRECURSOR_ID_KEYWORD: 1,
-    ILine.OOK0_KEYWORD: 2,
-    ILine.CCS_KEYWORD: 3,
-    ILine.RETENTION_TIME_KEYWORD: 4,
-    ILine.COLLISION_ENERGY_KEYWORD: 5,
-    ILine.ISOLATION_MZ_KEYWORD: 6,
-    ILine.ISOLATION_WIDTH_KEYWORD: 7,
-    ILine.SCAN_NUMBER_BEGIN_KEYWORD: 8,
-    ILine.SCAN_NUMBER_END_KEYWORD: 9,
-    ILine.PRECURSOR_INTENSITY_KEYWORD: 10,
-    ILine.OOK0_SPECTRA_KEYWORD: 11,
-    ILine.CCS_SPECTRA_KEYWORD: 12,
-    ILine.INTENSITY_SPECTRA_KEYWORD: 13,
-    ILine.MZ_SPECTRA_KEYWORD: 14
-}
-
-
-def get_key_for_keyword(keyword):
-    return np.int8(key_to_value_map[keyword])
-
 
 @dataclass
 class Ms2Spectra:
@@ -41,142 +19,171 @@ class Ms2Spectra:
 
     @property
     def mass(self):
-        return (self.mz * self.charge) - (self.charge - 1) * PROTON_MASS
+        return float((self.mz * self.charge) - (self.charge - 1) * PROTON_MASS)
 
     @property
-    def parent_id(self):
-        return self.i_line_dict.get(get_key_for_keyword(ILine.PARENT_ID_KEYWORD))
+    def parent_id(self) -> int:
+        return int(self.i_line_dict.get(ILine.PARENT_ID_KEYWORD))
 
     @parent_id.setter
-    def parent_id(self, val):
-        self.i_line_dict[get_key_for_keyword(ILine.PARENT_ID_KEYWORD)] = val
+    def parent_id(self, val: int):
+        self.i_line_dict[ILine.PARENT_ID_KEYWORD] = val
 
     @property
-    def precursor_id(self):
-        return self.i_line_dict.get(get_key_for_keyword(ILine.PRECURSOR_ID_KEYWORD))
+    def precursor_id(self) -> int:
+        return int(self.i_line_dict.get(ILine.PRECURSOR_ID_KEYWORD))
 
     @precursor_id.setter
-    def precursor_id(self, val):
-        self.i_line_dict[get_key_for_keyword(ILine.PRECURSOR_ID_KEYWORD)] = val
+    def precursor_id(self, val: int):
+        self.i_line_dict[ILine.PRECURSOR_ID_KEYWORD] = val
 
     @property
-    def retention_time(self):
-        return self.i_line_dict.get(get_key_for_keyword(ILine.RETENTION_TIME_KEYWORD))
+    def retention_time(self) -> float:
+        return float(self.i_line_dict.get(ILine.RETENTION_TIME_KEYWORD))
 
     @retention_time.setter
-    def retention_time(self, val):
-        self.i_line_dict[get_key_for_keyword(ILine.RETENTION_TIME_KEYWORD)] = val
+    def retention_time(self, val: float):
+        self.i_line_dict[ILine.RETENTION_TIME_KEYWORD] = val
 
     @property
-    def collision_energy(self):
-        return self.i_line_dict.get(get_key_for_keyword(ILine.COLLISION_ENERGY_KEYWORD))
+    def collision_energy(self) -> float:
+        return float(self.i_line_dict.get(ILine.COLLISION_ENERGY_KEYWORD))
 
     @collision_energy.setter
-    def collision_energy(self, val):
-        self.i_line_dict[get_key_for_keyword(ILine.COLLISION_ENERGY_KEYWORD)] = val
+    def collision_energy(self, val: float):
+        self.i_line_dict[ILine.COLLISION_ENERGY_KEYWORD] = val
 
     @property
-    def ook0(self):
-        return self.i_line_dict.get(get_key_for_keyword(ILine.OOK0_KEYWORD))
+    def ook0(self) -> float:
+        return float(self.i_line_dict.get(ILine.OOK0_KEYWORD))
 
     @ook0.setter
-    def ook0(self, val):
-        self.i_line_dict[get_key_for_keyword(ILine.OOK0_KEYWORD)] = val
+    def ook0(self, val: float):
+        self.i_line_dict[ILine.OOK0_KEYWORD] = val
 
     @property
-    def ccs(self):
-        return self.i_line_dict.get(get_key_for_keyword(ILine.CCS_KEYWORD))
+    def ccs(self) -> float:
+        return float(self.i_line_dict.get(ILine.CCS_KEYWORD))
 
     @ccs.setter
-    def ccs(self, val):
-        self.i_line_dict[get_key_for_keyword(ILine.CCS_KEYWORD)] = val
+    def ccs(self, val: float):
+        self.i_line_dict[ILine.CCS_KEYWORD] = val
 
     @property
-    def precursor_intensity(self):
-        return self.i_line_dict.get(get_key_for_keyword(ILine.PRECURSOR_INTENSITY_KEYWORD))
+    def precursor_intensity(self) -> float:
+        return float(self.i_line_dict.get(ILine.PRECURSOR_INTENSITY_KEYWORD))
 
     @precursor_intensity.setter
-    def precursor_intensity(self, val):
-        self.i_line_dict[get_key_for_keyword(ILine.PRECURSOR_INTENSITY_KEYWORD)] = val
+    def precursor_intensity(self, val: float):
+        self.i_line_dict[ILine.PRECURSOR_INTENSITY_KEYWORD] = val
+
 
     @property
-    def ook0_spectra(self):
-        return self.i_line_dict.get(get_key_for_keyword(ILine.OOK0_SPECTRA_KEYWORD))
+    def ook0_spectra(self) -> List[float]:
+        return [float(i) for i in ast.literal_eval(self.i_line_dict.get(ILine.OOK0_SPECTRA_KEYWORD))]
 
     @ook0_spectra.setter
-    def ook0_spectra(self, val):
-        self.i_line_dict[get_key_for_keyword(ILine.OOK0_SPECTRA_KEYWORD)] = val
+    def ook0_spectra(self, val: List[float]):
+        self.i_line_dict[ILine.OOK0_SPECTRA_KEYWORD] = val
 
     @property
-    def ccs_spectra(self):
-        return self.i_line_dict.get(get_key_for_keyword(ILine.CCS_SPECTRA_KEYWORD))
+    def ccs_spectra(self) -> List[float]:
+        return [float(i) for i in ast.literal_eval(self.i_line_dict.get(ILine.CCS_SPECTRA_KEYWORD))]
 
     @ccs_spectra.setter
-    def ccs_spectra(self, val):
-        self.i_line_dict[get_key_for_keyword(ILine.CCS_SPECTRA_KEYWORD)] = val
+    def ccs_spectra(self, val: List[float]):
+        self.i_line_dict[ILine.CCS_SPECTRA_KEYWORD] = val
 
     @property
-    def mobility_intensity_spectra(self):
-        return self.i_line_dict.get(get_key_for_keyword(ILine.INTENSITY_SPECTRA_KEYWORD))
+    def mobility_intensity_spectra(self) -> List[float]:
+        return [float(i) for i in ast.literal_eval(self.i_line_dict.get(ILine.INTENSITY_SPECTRA_KEYWORD))]
 
     @mobility_intensity_spectra.setter
-    def mobility_intensity_spectra(self, val):
-        self.i_line_dict[get_key_for_keyword(ILine.INTENSITY_SPECTRA_KEYWORD)] = val
+    def mobility_intensity_spectra(self, val: List[float]):
+        self.i_line_dict[ILine.INTENSITY_SPECTRA_KEYWORD] = val
 
     @property
-    def mobility_mz_spectra(self):
-        return self.i_line_dict.get(get_key_for_keyword(ILine.MZ_SPECTRA_KEYWORD))
+    def mobility_mz_spectra(self) -> List[float]:
+        return [float(i) for i in ast.literal_eval(self.i_line_dict.get(ILine.MZ_SPECTRA_KEYWORD))]
 
     @mobility_mz_spectra.setter
-    def mobility_mz_spectra(self, val):
-        self.i_line_dict[get_key_for_keyword(ILine.MZ_SPECTRA_KEYWORD)] = val
+    def mobility_mz_spectra(self, val: List[float]):
+        self.i_line_dict[ILine.MZ_SPECTRA_KEYWORD] = val
 
     @property
-    def isolation_mz(self):
-        return self.i_line_dict.get(get_key_for_keyword(ILine.ISOLATION_MZ_KEYWORD))
+    def isolation_mz(self) -> float:
+        return float(self.i_line_dict.get(ILine.ISOLATION_MZ_KEYWORD))
 
     @isolation_mz.setter
-    def isolation_mz(self, val):
-        self.i_line_dict[get_key_for_keyword(ILine.ISOLATION_MZ_KEYWORD)] = val
+    def isolation_mz(self, val: float):
+        self.i_line_dict[ILine.ISOLATION_MZ_KEYWORD] = val
 
     @property
-    def isolation_width(self):
-        return self.i_line_dict.get(get_key_for_keyword(ILine.ISOLATION_WIDTH_KEYWORD))
+    def isolation_width(self) -> float:
+        return float(self.i_line_dict.get(ILine.ISOLATION_WIDTH_KEYWORD))
 
     @isolation_width.setter
-    def isolation_width(self, val):
-        self.i_line_dict[get_key_for_keyword(ILine.ISOLATION_WIDTH_KEYWORD)] = val
+    def isolation_width(self, val: float):
+        self.i_line_dict[ILine.ISOLATION_WIDTH_KEYWORD] = val
 
     @property
-    def scan_num_begin(self):
-        return self.i_line_dict.get(get_key_for_keyword(ILine.SCAN_NUMBER_BEGIN_KEYWORD))
+    def scan_num_begin(self) -> float:
+        return float(self.i_line_dict.get(ILine.SCAN_NUMBER_BEGIN_KEYWORD))
 
     @scan_num_begin.setter
-    def scan_num_begin(self, val):
-        self.i_line_dict[get_key_for_keyword(ILine.SCAN_NUMBER_BEGIN_KEYWORD)] = val
+    def scan_num_begin(self, val: float):
+        self.i_line_dict[ILine.SCAN_NUMBER_BEGIN_KEYWORD] = val
 
     @property
-    def scan_num_end(self):
-        return self.i_line_dict.get(get_key_for_keyword(ILine.SCAN_NUMBER_END_KEYWORD))
+    def scan_num_end(self) -> float:
+        return float(self.i_line_dict.get(ILine.SCAN_NUMBER_END_KEYWORD))
 
     @scan_num_end.setter
-    def scan_num_end(self, val):
-        self.i_line_dict[get_key_for_keyword(ILine.SCAN_NUMBER_END_KEYWORD)] = val
+    def scan_num_end(self, val: float):
+        self.i_line_dict[ILine.SCAN_NUMBER_END_KEYWORD] = val
+
+    @staticmethod
+    def setup_from_ms2_lines(lines):
+        i_lines = {}
+        mz_spectra, int_spectra = [], []
+        low_scan, high_scan, mz, charge, mass = None, None, None, None, None
+        for line in lines:
+            if line[0] == 'S':
+                letter, low_scan, high_scan, mz = line.rstrip().split("\t")
+                low_scan = int(low_scan)
+                high_scan = int(high_scan)
+                mz = float(mz)
+            elif line[0] == 'Z':
+                letter, charge, mass = line.rstrip().split("\t")
+                charge = int(charge)
+                mass = float(mass)
+            elif line[0] == 'I':
+                letter, key, val = line.rstrip().split("\t")
+                i_lines[key] = val
+            else:
+                mz, i, = map(float, line.rstrip().split(" "))
+                mz_spectra.append(mz)
+                int_spectra.append(i)
+
+        return Ms2Spectra(scan_id=low_scan, mz=mz,
+                          charge=charge, i_line_dict=i_lines,
+                          mz_spectra=np.array(mz_spectra, dtype=np.float64),
+                          int_spectra=np.array(int_spectra, dtype=np.float32))
 
 
 def convert_precursor_to_i_line_dict(precursor):
     return {
-        key_to_value_map[ILine.PARENT_ID_KEYWORD]: precursor['prec_parent_id'][0],
-        key_to_value_map[ILine.PRECURSOR_ID_KEYWORD]: precursor['prec_id'][0],
-        key_to_value_map[ILine.OOK0_KEYWORD]: precursor['ook0'][0],
-        key_to_value_map[ILine.CCS_KEYWORD]: precursor['ccs'][0],
-        key_to_value_map[ILine.RETENTION_TIME_KEYWORD]: precursor['rt'][0],
-        key_to_value_map[ILine.COLLISION_ENERGY_KEYWORD]: precursor['ce'][0],
-        key_to_value_map[ILine.ISOLATION_MZ_KEYWORD]: precursor['iso_mz'][0],
-        key_to_value_map[ILine.ISOLATION_WIDTH_KEYWORD]: precursor['iso_width'][0],
-        key_to_value_map[ILine.SCAN_NUMBER_BEGIN_KEYWORD]: precursor['scan_num_begin'][0],
-        key_to_value_map[ILine.SCAN_NUMBER_END_KEYWORD]: precursor['scan_num_end'][0],
-        key_to_value_map[ILine.PRECURSOR_INTENSITY_KEYWORD]: precursor['intensity'][0]
+        ILine.PARENT_ID_KEYWORD: precursor['prec_parent_id'][0],
+        ILine.PRECURSOR_ID_KEYWORD: precursor['prec_id'][0],
+        ILine.OOK0_KEYWORD: precursor['ook0'][0],
+        ILine.CCS_KEYWORD: precursor['ccs'][0],
+        ILine.RETENTION_TIME_KEYWORD: precursor['rt'][0],
+        ILine.COLLISION_ENERGY_KEYWORD: precursor['ce'][0],
+        ILine.ISOLATION_MZ_KEYWORD: precursor['iso_mz'][0],
+        ILine.ISOLATION_WIDTH_KEYWORD: precursor['iso_width'][0],
+        ILine.SCAN_NUMBER_BEGIN_KEYWORD: precursor['scan_num_begin'][0],
+        ILine.SCAN_NUMBER_END_KEYWORD: precursor['scan_num_end'][0],
+        ILine.PRECURSOR_INTENSITY_KEYWORD: precursor['intensity'][0]
     }
 
 
@@ -205,3 +212,4 @@ def read_file(hdf5_file) -> List[Ms2Spectra]:
 
 if __name__ == '__main__':
     spectra = read_file(r"C:\data\test.d\test.hdf5")
+

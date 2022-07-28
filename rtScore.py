@@ -131,7 +131,7 @@ def generate_rt_score_sqt(sqt_file, ms2_file, out_file, retention_time_keyword):
             m_line.predicted_ook0 = predicted_rt
             m_line.tims_score = timsscore
 
-    sqt_parser.write_file(_, s_lines, out_file, version="v2.1.0_ext")
+    sqt_parser.write_file(_, s_lines, str(out_file), version="v2.1.0_ext")
 
 
 if __name__ == '__main__':
@@ -152,7 +152,6 @@ if __name__ == '__main__':
             quit(1)
 
         for ms2, sqt in zip(ms2_files, sqt_files):
-
             if args.newfile:
                 args.out = Path(str(sqt) + ".rtscore")
             print(str(ms2).split("\\")[-1])

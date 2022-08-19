@@ -11,16 +11,16 @@ from ..ms2.lines import Ms2Spectra, ILine
 
 @dataclass
 class Ms2Spectra:
-    scan_id: np.int32
-    mz: np.float64
-    charge: np.int8
+    scan_id: float
+    mz: float
+    charge: int
     i_line_dict: Dict[int, Any]
     mz_spectra: np.ndarray
     int_spectra: np.ndarray
 
     @property
     def mass(self):
-        return float((self.mz * self.charge) - (self.charge - 1) * PROTON_MASS)
+        return float(self.mz * self.charge - self.charge * PROTON_MASS)
 
     @property
     def parent_id(self) -> int:
@@ -152,8 +152,8 @@ class Ms2Spectra:
             if line[0] == 'S':
                 letter, low_scan, high_scan, mz = line.rstrip().split("\t")
                 low_scan = int(low_scan)
-                high_scan = int(high_scan)
-                mz = float(mz)
+                #high_scan = int(high_scan)
+                prec_mz = float(mz)
             elif line[0] == 'Z':
                 letter, charge, mass = line.rstrip().split("\t")
                 charge = int(charge)
@@ -165,8 +165,7 @@ class Ms2Spectra:
                 mz, i, = map(float, line.rstrip().split(" "))
                 mz_spectra.append(mz)
                 int_spectra.append(i)
-
-        return Ms2Spectra(scan_id=low_scan, mz=mz,
+        return Ms2Spectra(scan_id=low_scan, mz=prec_mz,
                           charge=charge, i_line_dict=i_lines,
                           mz_spectra=np.array(mz_spectra, dtype=np.float64),
                           int_spectra=np.array(int_spectra, dtype=np.float32))
@@ -198,15 +197,14 @@ def read_file(hdf5_file) -> List[Ms2Spectra]:
             n_peaks = precursor['n_peaks'][0]
             precursor_spectra = spectras[offset:offset + n_peaks]
             i_line_dict = convert_precursor_to_i_line_dict(precursor)
-            ms2_spectra = Ms2Spectra(scan_id=precursor['scan_id'][0],
-                                     mz=precursor['mz'][0],
-                                     charge=precursor['charge'][0],
+            ms2_spectra = Ms2Spectra(scan_id=float(precursor['scan_id'][0]),
+                                     mz=float(precursor['mz'][0]),
+                                     charge=int(precursor['charge'][0]),
                                      i_line_dict=i_line_dict,
                                      mz_spectra=precursor_spectra['mz_array'],
                                      int_spectra=precursor_spectra['intensity_array']
                                      )
             ms2_spectras.append(ms2_spectra)
-
             offset += n_peaks
     return ms2_spectras
 

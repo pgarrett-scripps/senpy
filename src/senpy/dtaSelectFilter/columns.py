@@ -117,6 +117,9 @@ class ProteinLineColumns_v2_1_12(Enum):
     nsaf = 8
     empai = 9
     description_name = 10
+    h_redundancy = 11
+    l_redundancy = 12
+    m_redundancy = 13
 
 class ProteinLineColumns_v2_1_13(Enum):
     """

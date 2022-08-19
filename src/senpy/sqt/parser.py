@@ -1,8 +1,10 @@
+from typing import List, Union
+
 from .lines import SLine, parse_sqt_line, MLine, LLine
 from ..util import HLine
 
 
-def read_file(file_path: str, version='auto') -> ([str], [SLine]):
+def read_file(sqt_input: Union[str, List], version='auto') -> ([str], [SLine]):
     """
     Return list of H_lines and S_lines, from provided sqt file. Will always
     return correctly and fully read Precursors/PSMCandidates/Locus' until
@@ -13,23 +15,33 @@ def read_file(file_path: str, version='auto') -> ([str], [SLine]):
     """
     h_lines, s_lines = [], []
 
-    with open(file_path) as file:
-        for line in file:
+    lines = []
+    if isinstance(sqt_input, str):
+        print("sqt input: filepath")
+        with open(sqt_input) as file:
+            lines = file.readlines()
+    elif isinstance(sqt_input, list):
+        print("sqt input: List")
+        lines = sqt_input
+    else:
+        raise Exception("invalid File Type")
 
-            if line == "" or line == "\n":
-                continue
+    for line in lines:
 
-            sqt_line = parse_sqt_line(line)
-            if isinstance(sqt_line, HLine):
-                h_lines.append(sqt_line)
-            elif isinstance(sqt_line, SLine):
-                s_lines.append(sqt_line)
-            elif isinstance(sqt_line, MLine):
-                s_lines[-1].m_lines.append(sqt_line)
-            elif isinstance(sqt_line, LLine):
-                s_lines[-1].m_lines[-1].l_lines.append(sqt_line)
+        if line == "" or line == "\n":
+            continue
 
-        return h_lines, s_lines
+        sqt_line = parse_sqt_line(line)
+        if isinstance(sqt_line, HLine):
+            h_lines.append(sqt_line)
+        elif isinstance(sqt_line, SLine):
+            s_lines.append(sqt_line)
+        elif isinstance(sqt_line, MLine):
+            s_lines[-1].m_lines.append(sqt_line)
+        elif isinstance(sqt_line, LLine):
+            s_lines[-1].m_lines[-1].l_lines.append(sqt_line)
+
+    return h_lines, s_lines
 
 
 def write_file(h_lines: [HLine], s_lines: [SLine], out_file_path: str, version='auto') -> None:

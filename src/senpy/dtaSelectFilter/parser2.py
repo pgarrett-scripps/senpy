@@ -161,7 +161,7 @@ class PeptideLine:
 
 @dataclass
 class DtaFilterResult:
-    protein: ProteinLine
+    proteins: List[ProteinLine] = field(default_factory=lambda: [])
     peptides: List[PeptideLine] = field(default_factory=lambda: [])
 
 
@@ -182,7 +182,7 @@ def read_file(file_input):
     protein_columns = None
     peptide_columns = None
 
-    dta_filter_results = []
+    dta_filter_results = [DtaFilterResult()]
 
     if isinstance(file_input, str):
         with open(file_input) as file:
@@ -213,8 +213,12 @@ def read_file(file_input):
         elif state == FileState.DATA:
             elems = line.rstrip().split('\t')
             if elems[1].isnumeric():
-                dta_filter_results.append(
-                    DtaFilterResult(ProteinLine({name: val for name, val in zip(protein_columns, elems)})))
+                if len(dta_filter_results[-1].peptides) != 0:
+                    dta_filter_results.append(DtaFilterResult())
+
+                protein_line = ProteinLine({name: val for name, val in zip(protein_columns, elems)})
+                dta_filter_results[-1].proteins.append(protein_line)
+
             elif elems[1].count(".") == 3:
                 dta_filter_results[-1].peptides.append(
                     PeptideLine({name: val for name, val in zip(peptide_columns, elems)}))

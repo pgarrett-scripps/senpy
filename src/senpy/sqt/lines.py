@@ -687,4 +687,4 @@ def parse_sqt_line(line: str, version='auto') -> Union[HLine, SLine, MLine, LLin
     elif line[0] == LLine.LETTER:
         return LLine.deserialize(line, version=version)
     else:
-        raise sqt_exceptions.SqtFileDeserializationUnsupportedLineException
+        raise sqt_exceptions.SqtFileDeserializationUnsupportedLineException(line)
